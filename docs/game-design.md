@@ -28,6 +28,14 @@ Design your own witch or wizard — from the shape of the head all the way down 
 
 Start with a very basic witch drawing (simple vector shapes, based on the daughter's drawing) and refine later.
 
+### Notes from the original drawings
+
+- **Character parts sheet:** pointy hats (starry and dark), capes and dresses for girl and boy variants, hair, face shapes, eyes, mouths and accessories — a good base for the character designer.
+- **Animals:** owl, bat, black cat, spider.
+- **Home scene:** a cosy house with a spiderweb, brooms, a cauldron, shelves of potions and a door.
+- **Shop:** a building marked "Shop" with brooms and animals.
+- **Witch sprite:** purple starry pointy hat, long straight purple robe.
+
 ## Milestones
 
 Each milestone is split into small, separately committable features.
