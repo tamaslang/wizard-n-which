@@ -1,0 +1,24 @@
+{
+  "name": "wizard-n-which",
+  "version": "1.0.0",
+  "description": "A browser-based step-by-step wizard for building a sandwich. Plain HTML/CSS/JS, no build step.",
+  "main": "app.js",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tamaslang/wizard-n-which.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tamaslang/wizard-n-which/issues"
+  },
+  "homepage": "https://github.com/tamaslang/wizard-n-which#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
+  },
+  "type": "module"
+}
