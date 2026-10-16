@@ -28,7 +28,8 @@ h2 { font-size: clamp(1.6rem, 5vw, 2.4rem); color: #ffb703; }
   border: 3px solid transparent;
 }
 .choice:hover, .choice:focus-visible { background: #3a2866; border-color: #ffb703; }
-.choice svg { width: 100%; }
+.choice-art { display: block; width: 100%; }
+.choice-art svg { width: 100%; display: block; }
 #game { width: min(96vw, 960px); height: auto; border-radius: 12px; box-shadow: 0 0 40px #0008; }
 .hint { color: #cdbdf2; }
 .designer { display: flex; gap: 1.5rem; align-items: flex-start; justify-content: center; flex-wrap: wrap; }

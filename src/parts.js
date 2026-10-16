@@ -150,5 +150,5 @@ export function characterSvgBody(c) {
     ${face[c.face](eyeX, cy)}
     ${!witch && c.beard === "moustache" ? beard.moustache(c.beardColor) : ""}
     ${witch ? earrings[c.earrings](c.earringColor, hr, cy) : ""}
-    ${hat[c.hat](c.hatColor)}`;
+    <g transform="translate(0 16)">${hat[c.hat](c.hatColor)}</g>`;
 }
