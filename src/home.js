@@ -1,10 +1,12 @@
-import { drawCharacter } from "./character.js";
+import { characterSvg, helperSvg } from "./character.js";
 
 const VIEW_W = 960;
 const VIEW_H = 540;
 const WORLD_W = 2400;
 const FLOOR_Y = 440;
 const SPEED = 260;
+const KID_SCALE = 0.5;
+const HELPER_SCALE = 0.4;
 
 const keys = new Set();
 let frame = 0;
@@ -16,10 +18,22 @@ addEventListener("keydown", (e) => {
 addEventListener("keyup", (e) => keys.delete(e.code));
 addEventListener("blur", () => keys.clear());
 
-export function startHome(canvas, character) {
+async function loadSvg(svg) {
+  const image = new Image();
+  image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  await image.decode();
+  return image;
+}
+
+export async function startHome(canvas, character) {
   cancelAnimationFrame(frame);
   const ctx = canvas.getContext("2d");
-  const player = { x: 200, dir: 1, walk: 0, character };
+  const player = {
+    x: 200, dir: 1, walk: 0, helperX: 130,
+    image: await loadSvg(characterSvg(character)),
+    helperKind: character.helper,
+    helperImage: character.helper === "none" ? null : await loadSvg(helperSvg(character.helper)),
+  };
   let last = performance.now();
 
   const tick = (now) => {
@@ -47,6 +61,8 @@ function update(player, dt) {
   } else {
     player.walk = 0;
   }
+  const target = player.x - player.dir * 75;
+  player.helperX += (target - player.helperX) * Math.min(1, dt * 5);
 }
 
 function draw(ctx, player) {
@@ -150,9 +166,20 @@ function drawDoor(ctx, x, label) {
 
 function drawKid(ctx, player) {
   const bob = Math.abs(Math.sin(player.walk)) * 4;
+  const s = KID_SCALE;
   ctx.save();
   ctx.translate(player.x, FLOOR_Y - bob);
   ctx.scale(player.dir, 1);
-  drawCharacter(ctx, player.character);
+  ctx.drawImage(player.image, (-200 * s) / 2, -250 * s, 200 * s, 260 * s);
   ctx.restore();
+
+  if (player.helperImage) {
+    const h = HELPER_SCALE;
+    const lift = player.helperKind === "bat" || player.helperKind === "owl" ? 40 + Math.sin(player.walk * 0.5 + performance.now() / 300) * 6 : 0;
+    ctx.save();
+    ctx.translate(player.helperX, FLOOR_Y - lift);
+    ctx.scale(player.dir, 1);
+    ctx.drawImage(player.helperImage, (-200 * h) / 2, -190 * h, 200 * h, 200 * h);
+    ctx.restore();
+  }
 }

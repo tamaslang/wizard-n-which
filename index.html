@@ -61,10 +61,19 @@
     </section>
 
     <section id="designer-screen" data-scene="designer" hidden>
-      <h2>Design your head</h2>
-      <canvas id="preview" width="300" height="330" aria-label="Character preview"></canvas>
-      <div id="head-options" class="options" role="group" aria-label="Head shape"></div>
-      <button id="designer-done" type="button">Done</button>
+      <h2>Make your own!</h2>
+      <div class="designer">
+        <div id="preview" aria-live="polite"></div>
+        <div class="panel">
+          <div id="tabs" class="tabs" role="group" aria-label="Categories"></div>
+          <div id="options" class="options grid" role="group" aria-label="Choices"></div>
+          <div id="swatches" class="swatches" role="group" aria-label="Colours"></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="surprise" type="button" class="secondary">🎲 Surprise me</button>
+        <button id="designer-done" type="button">Done</button>
+      </div>
     </section>
 
     <section id="home-screen" data-scene="home" hidden>
