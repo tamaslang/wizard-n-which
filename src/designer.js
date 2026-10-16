@@ -6,7 +6,8 @@ export function startDesigner({ state, onDone }) {
   const tabs = document.getElementById("tabs");
   const options = document.getElementById("options");
   const swatches = document.getElementById("swatches");
-  let current = CATEGORIES[0];
+  const categories = () => CATEGORIES.filter((c) => !c.only || c.only === state.character.type);
+  let current = categories()[0];
 
   const renderPreview = (bounce) => {
     preview.innerHTML = previewSvg(state.character);
@@ -24,7 +25,7 @@ export function startDesigner({ state, onDone }) {
 
   const renderTabs = () => {
     tabs.replaceChildren(
-      ...CATEGORIES.map((category) => {
+      ...categories().map((category) => {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "tab";
@@ -76,7 +77,7 @@ export function startDesigner({ state, onDone }) {
   };
 
   document.getElementById("surprise").onclick = () => {
-    state.character = randomCharacter();
+    state.character = randomCharacter(state.character.type);
     renderPanel();
     renderPreview(true);
   };

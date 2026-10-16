@@ -1,14 +1,16 @@
-import { CATEGORIES, CLOTH_COLORS, HAIR_COLORS, SKIN_COLORS, characterSvgBody, helpers } from "./parts.js";
+import { CATEGORIES, CLOTH_COLORS, HAIR_COLORS, JEWEL_COLORS, SKIN_COLORS, characterSvgBody, helpers } from "./parts.js";
 
 const NS = "http://www.w3.org/2000/svg";
 
 export const STARTERS = {
   witch: {
-    head: "round", skin: SKIN_COLORS[0], hair: "long", hairColor: HAIR_COLORS[2], beard: "none", beardColor: HAIR_COLORS[4],
+    type: "witch", earrings: "stars", earringColor: JEWEL_COLORS[0], beard: "none", beardColor: HAIR_COLORS[1],
+    head: "round", skin: SKIN_COLORS[0], hair: "long", hairColor: HAIR_COLORS[2],
     hat: "stars", hatColor: CLOTH_COLORS[0], outfit: "dress", outfitColor: CLOTH_COLORS[0], face: "happy", helper: "none",
   },
   wizard: {
-    head: "round", skin: SKIN_COLORS[0], hair: "short", hairColor: HAIR_COLORS[4], beard: "long", beardColor: HAIR_COLORS[4],
+    type: "wizard", earrings: "none", earringColor: JEWEL_COLORS[0],
+    head: "round", skin: SKIN_COLORS[0], hair: "short", hairColor: HAIR_COLORS[1], beard: "tuft", beardColor: HAIR_COLORS[1],
     hat: "stars", hatColor: CLOTH_COLORS[1], outfit: "cape", outfitColor: CLOTH_COLORS[1], face: "calm", helper: "none",
   },
 };
@@ -30,12 +32,12 @@ export function previewSvg(c) {
 
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
-export function randomCharacter() {
-  const c = {};
-  for (const { key, options, colorKey, colors } of CATEGORIES) {
+export function randomCharacter(type) {
+  const c = { ...STARTERS[type] };
+  for (const { key, options, colorKey, colors, only } of CATEGORIES) {
+    if (only && only !== type) continue;
     c[key] = pick(options);
     if (colorKey) c[colorKey] = pick(colors);
   }
-  if (c.beard !== "none" && Math.random() < 0.5) c.beard = "none";
   return c;
 }
