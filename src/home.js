@@ -1,0 +1,187 @@
+const VIEW_W = 960;
+const VIEW_H = 540;
+const WORLD_W = 2400;
+const FLOOR_Y = 440;
+const SPEED = 260;
+
+const COLORS = {
+  witch: { robe: "#3b2a8f", hat: "#3b2a8f" },
+  wizard: { robe: "#7a1f2b", hat: "#7a1f2b" },
+};
+
+const keys = new Set();
+let frame = 0;
+
+addEventListener("keydown", (e) => {
+  keys.add(e.code);
+  if (e.code.startsWith("Arrow")) e.preventDefault();
+});
+addEventListener("keyup", (e) => keys.delete(e.code));
+addEventListener("blur", () => keys.clear());
+
+export function startHome(canvas, character) {
+  cancelAnimationFrame(frame);
+  const ctx = canvas.getContext("2d");
+  const player = { x: 200, dir: 1, walk: 0, character };
+  let last = performance.now();
+
+  const tick = (now) => {
+    const dt = Math.min((now - last) / 1000, 0.05);
+    last = now;
+    update(player, dt);
+    draw(ctx, player);
+    frame = requestAnimationFrame(tick);
+  };
+  frame = requestAnimationFrame(tick);
+}
+
+export function stopHome() {
+  cancelAnimationFrame(frame);
+}
+
+function update(player, dt) {
+  const left = keys.has("ArrowLeft") || keys.has("KeyA");
+  const right = keys.has("ArrowRight") || keys.has("KeyD");
+  const move = (right ? 1 : 0) - (left ? 1 : 0);
+  if (move) {
+    player.dir = move;
+    player.walk += dt * 10;
+    player.x = Math.min(WORLD_W - 40, Math.max(40, player.x + move * SPEED * dt));
+  } else {
+    player.walk = 0;
+  }
+}
+
+function draw(ctx, player) {
+  const camX = Math.min(WORLD_W - VIEW_W, Math.max(0, player.x - VIEW_W / 2));
+  ctx.clearRect(0, 0, VIEW_W, VIEW_H);
+  ctx.save();
+  ctx.translate(-camX, 0);
+  drawRoom(ctx);
+  drawKid(ctx, player);
+  ctx.restore();
+}
+
+function drawRoom(ctx) {
+  ctx.fillStyle = "#4a3278";
+  ctx.fillRect(0, 0, WORLD_W, FLOOR_Y);
+  ctx.fillStyle = "#6b4a2b";
+  ctx.fillRect(0, FLOOR_Y, WORLD_W, VIEW_H - FLOOR_Y);
+
+  drawWeb(ctx, 40, 0);
+  drawShelf(ctx, 500);
+  drawCauldron(ctx, 1000);
+  drawBroom(ctx, 1400);
+  drawDoor(ctx, 2000, "Out");
+}
+
+function drawWeb(ctx, x, y) {
+  ctx.strokeStyle = "#d8cff0";
+  ctx.lineWidth = 2;
+  for (let i = 0; i <= 4; i++) {
+    const a = (i / 4) * (Math.PI / 2);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + Math.cos(a) * 160, y + Math.sin(a) * 160);
+    ctx.stroke();
+  }
+  for (let r = 40; r <= 160; r += 40) {
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI / 2);
+    ctx.stroke();
+  }
+}
+
+function drawShelf(ctx, x) {
+  ctx.fillStyle = "#8a5a2b";
+  ctx.fillRect(x, 220, 260, 12);
+  ctx.fillRect(x, 320, 260, 12);
+  const potions = ["#ff5fa2", "#5fd0ff", "#7dff8a", "#ffd166"];
+  potions.forEach((c, i) => {
+    ctx.fillStyle = c;
+    ctx.beginPath();
+    ctx.arc(x + 40 + i * 60, 200, 18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(x + 34 + i * 60, 168, 12, 16);
+    ctx.beginPath();
+    ctx.arc(x + 40 + i * 60, 300, 18, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function drawCauldron(ctx, x) {
+  ctx.fillStyle = "#1c1c26";
+  ctx.beginPath();
+  ctx.ellipse(x, FLOOR_Y - 45, 70, 55, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#7dff8a";
+  ctx.beginPath();
+  ctx.ellipse(x, FLOOR_Y - 85, 55, 12, 0, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawBroom(ctx, x) {
+  ctx.strokeStyle = "#8a5a2b";
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.moveTo(x, FLOOR_Y);
+  ctx.lineTo(x + 40, FLOOR_Y - 220);
+  ctx.stroke();
+  ctx.fillStyle = "#c9a227";
+  ctx.beginPath();
+  ctx.moveTo(x - 20, FLOOR_Y);
+  ctx.lineTo(x + 20, FLOOR_Y);
+  ctx.lineTo(x + 10, FLOOR_Y - 60);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawDoor(ctx, x, label) {
+  ctx.fillStyle = "#2e1b12";
+  ctx.beginPath();
+  ctx.roundRect(x, FLOOR_Y - 220, 130, 220, [65, 65, 0, 0]);
+  ctx.fill();
+  ctx.fillStyle = "#ffd166";
+  ctx.beginPath();
+  ctx.arc(x + 105, FLOOR_Y - 100, 7, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#f2eaff";
+  ctx.font = "bold 22px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(label, x + 65, FLOOR_Y - 120);
+}
+
+function drawKid(ctx, player) {
+  const { robe, hat } = COLORS[player.character];
+  const bob = Math.abs(Math.sin(player.walk)) * 4;
+  ctx.save();
+  ctx.translate(player.x, FLOOR_Y - bob);
+  ctx.scale(player.dir, 1);
+
+  ctx.fillStyle = robe;
+  ctx.beginPath();
+  ctx.moveTo(0, -50);
+  ctx.quadraticCurveTo(-28, -48, -30, 0);
+  ctx.lineTo(30, 0);
+  ctx.quadraticCurveTo(28, -48, 0, -50);
+  ctx.fill();
+
+  ctx.fillStyle = "#ffe0bd";
+  ctx.beginPath();
+  ctx.arc(0, -68, 20, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#222";
+  ctx.beginPath();
+  ctx.arc(8, -70, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = hat;
+  ctx.beginPath();
+  ctx.moveTo(-2, -122);
+  ctx.lineTo(-26, -78);
+  ctx.lineTo(24, -78);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillRect(-32, -80, 62, 6);
+  ctx.restore();
+}

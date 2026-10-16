@@ -1,4 +1,5 @@
 import { state, showScene } from "./scenes.js";
+import { startHome } from "./home.js";
 
 const isPhone = matchMedia("(pointer: coarse) and (max-width: 820px)").matches;
 
@@ -17,8 +18,8 @@ addEventListener("DOMContentLoaded", () => {
   for (const button of document.querySelectorAll(".choice")) {
     button.addEventListener("click", () => {
       state.character = button.dataset.character;
-      document.getElementById("choice-result").textContent =
-        `You chose to be a ${state.character}! The character designer is coming soon.`;
+      showScene("home");
+      startHome(document.getElementById("game"), state.character);
     });
   }
 });
