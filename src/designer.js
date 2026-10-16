@@ -1,37 +1,87 @@
-import { HEADS, drawCharacter } from "./character.js";
+import { CATEGORIES } from "./parts.js";
+import { characterSvg, helperSvg, previewSvg, randomCharacter } from "./character.js";
 
 export function startDesigner({ state, onDone }) {
-  const canvas = document.getElementById("preview");
-  const options = document.getElementById("head-options");
-  const ctx = canvas.getContext("2d");
+  const preview = document.getElementById("preview");
+  const tabs = document.getElementById("tabs");
+  const options = document.getElementById("options");
+  const swatches = document.getElementById("swatches");
+  let current = CATEGORIES[0];
 
-  const render = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height - 20);
-    ctx.scale(2.2, 2.2);
-    drawCharacter(ctx, state.character);
-    ctx.restore();
-    for (const button of options.children) {
-      button.setAttribute("aria-pressed", button.dataset.head === state.character.head);
+  const renderPreview = (bounce) => {
+    preview.innerHTML = previewSvg(state.character);
+    if (bounce) {
+      preview.classList.remove("bounce");
+      void preview.offsetWidth;
+      preview.classList.add("bounce");
     }
   };
 
-  options.replaceChildren(
-    ...Object.entries(HEADS).map(([key, { label }]) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "option";
-      button.dataset.head = key;
-      button.textContent = label;
-      button.addEventListener("click", () => {
-        state.character.head = key;
-        render();
-      });
-      return button;
-    })
-  );
+  const thumb = (category, id) =>
+    category.key === "helper"
+      ? helperSvg(id === "none" ? "none" : id)
+      : characterSvg({ ...state.character, [category.key]: id });
 
+  const renderTabs = () => {
+    tabs.replaceChildren(
+      ...CATEGORIES.map((category) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "tab";
+        button.setAttribute("aria-pressed", category === current);
+        button.innerHTML = `<span class="icon">${category.icon}</span>${category.label}`;
+        button.onclick = () => {
+          current = category;
+          renderPanel();
+        };
+        return button;
+      })
+    );
+  };
+
+  const renderPanel = () => {
+    renderTabs();
+    options.replaceChildren(
+      ...current.options.map((id) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "option";
+        button.setAttribute("aria-label", id);
+        button.setAttribute("aria-pressed", state.character[current.key] === id);
+        button.innerHTML = id === "none" ? `<span class="none">None</span>` : thumb(current, id);
+        button.onclick = () => {
+          state.character[current.key] = id;
+          renderPanel();
+          renderPreview(true);
+        };
+        return button;
+      })
+    );
+    swatches.replaceChildren(
+      ...(current.colors ?? []).map((color) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "swatch";
+        button.style.background = color;
+        button.setAttribute("aria-label", `colour ${color}`);
+        button.setAttribute("aria-pressed", state.character[current.colorKey] === color);
+        button.onclick = () => {
+          state.character[current.colorKey] = color;
+          renderPanel();
+          renderPreview(true);
+        };
+        return button;
+      })
+    );
+  };
+
+  document.getElementById("surprise").onclick = () => {
+    state.character = randomCharacter();
+    renderPanel();
+    renderPreview(true);
+  };
   document.getElementById("designer-done").onclick = onDone;
-  render();
+
+  renderPanel();
+  renderPreview(false);
 }

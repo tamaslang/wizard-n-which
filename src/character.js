@@ -1,44 +1,41 @@
-export const HEADS = {
-  round: { label: "Round", rx: 20, ry: 20 },
-  oval: { label: "Oval", rx: 16, ry: 24 },
-  wide: { label: "Wide", rx: 25, ry: 18 },
+import { CATEGORIES, CLOTH_COLORS, HAIR_COLORS, SKIN_COLORS, characterSvgBody, helpers } from "./parts.js";
+
+const NS = "http://www.w3.org/2000/svg";
+
+export const STARTERS = {
+  witch: {
+    head: "round", skin: SKIN_COLORS[0], hair: "long", hairColor: HAIR_COLORS[2], beard: "none", beardColor: HAIR_COLORS[4],
+    hat: "stars", hatColor: CLOTH_COLORS[0], outfit: "dress", outfitColor: CLOTH_COLORS[0], face: "happy", helper: "none",
+  },
+  wizard: {
+    head: "round", skin: SKIN_COLORS[0], hair: "short", hairColor: HAIR_COLORS[4], beard: "long", beardColor: HAIR_COLORS[4],
+    hat: "stars", hatColor: CLOTH_COLORS[1], outfit: "cape", outfitColor: CLOTH_COLORS[1], face: "calm", helper: "none",
+  },
 };
 
-const COLORS = {
-  witch: { robe: "#3b2a8f", hat: "#3b2a8f" },
-  wizard: { robe: "#7a1f2b", hat: "#7a1f2b" },
-};
+export function characterSvg(c) {
+  return `<svg xmlns="${NS}" viewBox="0 0 200 260">${characterSvgBody(c)}</svg>`;
+}
 
-// Draws the character with feet at (0, 0), facing right.
-export function drawCharacter(ctx, { type, head }) {
-  const { robe, hat } = COLORS[type];
-  const { rx, ry } = HEADS[head];
-  const headY = -50 - ry;
+export function helperSvg(name) {
+  return `<svg xmlns="${NS}" viewBox="0 0 200 200">${helpers[name]()}</svg>`;
+}
 
-  ctx.fillStyle = robe;
-  ctx.beginPath();
-  ctx.moveTo(0, -50);
-  ctx.quadraticCurveTo(-28, -48, -30, 0);
-  ctx.lineTo(30, 0);
-  ctx.quadraticCurveTo(28, -48, 0, -50);
-  ctx.fill();
+// Character on the left, helper (if any) standing beside it.
+export function previewSvg(c) {
+  const helper = c.helper === "none" ? "" : `<g transform="translate(185 120) scale(0.7)">${helpers[c.helper]()}</g>`;
+  return `<svg xmlns="${NS}" viewBox="0 0 330 260" role="img" aria-label="Your character">
+    <g transform="translate(-10 0)">${characterSvgBody(c)}</g>${helper}</svg>`;
+}
 
-  ctx.fillStyle = "#ffe0bd";
-  ctx.beginPath();
-  ctx.ellipse(0, headY, rx, ry, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = "#222";
-  ctx.beginPath();
-  ctx.arc(rx * 0.4, headY - 2, 2.5, 0, Math.PI * 2);
-  ctx.fill();
+const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
-  const brimY = headY - ry * 0.6;
-  ctx.fillStyle = hat;
-  ctx.beginPath();
-  ctx.moveTo(-2, brimY - 44);
-  ctx.lineTo(-26, brimY);
-  ctx.lineTo(24, brimY);
-  ctx.closePath();
-  ctx.fill();
-  ctx.fillRect(-32, brimY - 2, 62, 6);
+export function randomCharacter() {
+  const c = {};
+  for (const { key, options, colorKey, colors } of CATEGORIES) {
+    c[key] = pick(options);
+    if (colorKey) c[colorKey] = pick(colors);
+  }
+  if (c.beard !== "none" && Math.random() < 0.5) c.beard = "none";
+  return c;
 }
