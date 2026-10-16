@@ -31,6 +31,10 @@ h2 { font-size: clamp(1.6rem, 5vw, 2.4rem); color: #ffb703; }
 .choice svg { width: 100%; }
 #game { width: min(96vw, 960px); height: auto; border-radius: 12px; box-shadow: 0 0 40px #0008; }
 .hint { color: #cdbdf2; }
+#preview { display: block; margin: 0 auto; background: #2a1b4d; border-radius: 20px; }
+.options { display: flex; gap: .75rem; justify-content: center; margin: 1rem 0 1.5rem; }
+.option { padding: .5rem 1.4rem; font-size: 1.1rem; background: #2a1b4d; color: #f2eaff; border: 3px solid transparent; }
+.option[aria-pressed="true"] { border-color: #ffb703; background: #3a2866; }
 button {
   background: #ffb703;
   color: #2a1b4d;
