@@ -3,73 +3,102 @@ const INK = "#2b1b4a";
 export const SKIN_COLORS = ["#ffe0bd", "#f1c27d", "#c68642", "#8d5524", "#5c3a21"];
 export const CLOTH_COLORS = ["#3b2a8f", "#7a1f2b", "#1f6f6f", "#2f8f5f", "#8f1f4f", "#2f5fa8", "#e0a030", "#2b2b3a"];
 export const HAIR_COLORS = ["#2b1b1b", "#7a4a1a", "#c47a2c", "#e0c050", "#aaaaaa", "#d04a8a", "#4a8fd0"];
+export const JEWEL_COLORS = ["#ffd166", "#ff5fa2", "#5fd0ff", "#7dff8a", "#e8e8f0"];
 
-const head = {
-  round: (c) => `<circle cx="100" cy="105" r="34" fill="${c.skin}" stroke="${INK}" stroke-width="2"/>`,
-  oval: (c) => `<ellipse cx="100" cy="108" rx="29" ry="39" fill="${c.skin}" stroke="${INK}" stroke-width="2"/>`,
-  wide: (c) => `<ellipse cx="100" cy="106" rx="40" ry="32" fill="${c.skin}" stroke="${INK}" stroke-width="2"/>`,
+// Child proportions: a big head on a small body.
+const HEAD = {
+  round: { rx: 40, ry: 40, cy: 114 },
+  oval: { rx: 34, ry: 46, cy: 116 },
+  wide: { rx: 46, ry: 36, cy: 112 },
 };
+
+const head = (c) => {
+  const { rx, ry, cy } = HEAD[c.head];
+  return `<ellipse cx="100" cy="${cy}" rx="${rx}" ry="${ry}" fill="${c.skin}" stroke="${INK}" stroke-width="2"/>`;
+};
+
+const legsAndShoes = (c) => `
+  <rect x="82" y="214" width="12" height="30" fill="${c.skin}" stroke="${INK}" stroke-width="1.5"/>
+  <rect x="106" y="214" width="12" height="30" fill="${c.skin}" stroke="${INK}" stroke-width="1.5"/>
+  <ellipse cx="86" cy="246" rx="15" ry="7" fill="#4a2a6a" stroke="${INK}" stroke-width="1.5"/>
+  <ellipse cx="114" cy="246" rx="15" ry="7" fill="#4a2a6a" stroke="${INK}" stroke-width="1.5"/>`;
 
 const hairBack = {
   none: () => "",
-  bob: (c) => `<path d="M62 112 Q60 60 100 62 Q140 60 138 112 L138 135 L62 135Z" fill="${c}"/>`,
-  long: (c) => `<path d="M60 112 Q58 58 100 60 Q142 58 140 112 L146 200 L54 200Z" fill="${c}"/>`,
-  braid: (c) => `<path d="M62 112 Q60 60 100 62 Q140 60 138 112Z" fill="${c}"/>
-    <path d="M136 110 Q160 150 150 215" stroke="${c}" stroke-width="14" fill="none" stroke-linecap="round"/>
-    <path d="M140 130 l10 8 M144 150 l10 8 M146 170 l-10 8 M148 190 l-10 8" stroke="${INK}" stroke-width="2" opacity=".5"/>`,
-  ponytail: (c) => `<path d="M64 108 Q62 62 100 62 Q138 62 136 108Z" fill="${c}"/>
-    <path d="M134 90 Q175 100 160 190" stroke="${c}" stroke-width="16" fill="none" stroke-linecap="round"/>`,
-  short: (c) => `<path d="M64 108 Q60 60 100 62 Q140 60 136 108Z" fill="${c}"/>`,
+  bob: (c, hr) => `<path d="M${98 - hr} 120 Q${96 - hr} 64 100 64 Q${104 + hr} 64 ${102 + hr} 120 L${102 + hr} 152 L${98 - hr} 152Z" fill="${c}"/>`,
+  long: (c, hr) => `<path d="M${97 - hr} 120 Q${95 - hr} 62 100 62 Q${105 + hr} 62 ${103 + hr} 120 L${108 + hr} 205 L${92 - hr} 205Z" fill="${c}"/>`,
+  braid: (c, hr) => `<path d="M${98 - hr} 120 Q${96 - hr} 64 100 64 Q${104 + hr} 64 ${102 + hr} 120Z" fill="${c}"/>
+    <path d="M${hr + 96} 120 Q${hr + 122} 160 ${hr + 108} 220" stroke="${c}" stroke-width="15" fill="none" stroke-linecap="round"/>
+    <path d="M${hr + 106} 140 l10 8 M${hr + 110} 160 l10 8 M${hr + 112} 180 l-10 8 M${hr + 110} 200 l-10 8" stroke="${INK}" stroke-width="2" opacity=".5"/>`,
+  ponytail: (c, hr) => `<path d="M${98 - hr} 116 Q${96 - hr} 64 100 64 Q${104 + hr} 64 ${102 + hr} 116Z" fill="${c}"/>
+    <path d="M${hr + 90} 90 Q${hr + 135} 100 ${hr + 115} 185" stroke="${c}" stroke-width="18" fill="none" stroke-linecap="round"/>`,
+  short: (c, hr) => `<path d="M${98 - hr} 114 Q${96 - hr} 64 100 64 Q${104 + hr} 64 ${102 + hr} 114Z" fill="${c}"/>`,
 };
 
 const hairFront = {
-  short: (c) => `<path d="M64 108 Q60 60 100 62 Q140 60 136 108 L125 88 Q100 98 75 88Z" fill="${c}"/>`,
-  bob: (c) => `<path d="M66 100 Q70 66 100 66 Q130 66 134 100 Q110 84 66 100Z" fill="${c}"/>`,
-  long: (c) => `<path d="M66 100 Q70 66 100 66 Q130 66 134 100 Q110 84 66 100Z" fill="${c}"/>`,
+  short: (c, hr, cy) => `<path d="M${100 - hr} ${cy - 6} Q${100 - hr} ${cy - 46} 100 ${cy - 46} Q${100 + hr} ${cy - 46} ${100 + hr} ${cy - 6} L${100 + hr - 12} ${cy - 24} Q100 ${cy - 14} ${100 - hr + 12} ${cy - 24}Z" fill="${c}"/>`,
+  bob: (c, hr, cy) => `<path d="M${100 - hr} ${cy - 10} Q${100 - hr + 4} ${cy - 46} 100 ${cy - 46} Q${100 + hr - 4} ${cy - 46} ${100 + hr} ${cy - 10} Q${100 + hr / 2} ${cy - 30} ${100 - hr} ${cy - 10}Z" fill="${c}"/>`,
 };
+hairFront.long = hairFront.bob;
+hairFront.braid = hairFront.bob;
+hairFront.ponytail = hairFront.bob;
 
+// Wizards: a small, child-friendly beard.
 const beard = {
   none: () => "",
-  long: (c) => `<path d="M72 118 Q100 150 128 118 Q132 175 100 215 Q68 175 72 118Z" fill="${c}" stroke="${INK}" stroke-width="2"/>`,
-  moustache: (c) => `<path d="M82 124 Q100 114 118 124 Q100 130 82 124Z" fill="${c}"/>`,
+  tuft: (c) => `<path d="M88 148 Q100 172 112 148 Q100 154 88 148Z" fill="${c}" stroke="${INK}" stroke-width="1.5"/>`,
+  moustache: (c) => `<path d="M84 131 Q100 122 116 131 Q100 137 84 131Z" fill="${c}"/>`,
+  full: (c) => `<path d="M64 130 Q80 168 100 168 Q120 168 136 130 Q120 150 100 150 Q80 150 64 130Z" fill="${c}" stroke="${INK}" stroke-width="1.5"/>`,
+};
+
+// Witches: earrings on both ears.
+const earrings = {
+  none: () => "",
+  studs: (c, hr, cy) => [-1, 1].map((s) => `<circle cx="${100 + s * (hr + 1)}" cy="${cy + 8}" r="4" fill="${c}" stroke="${INK}" stroke-width="1"/>`).join(""),
+  hoops: (c, hr, cy) => [-1, 1].map((s) => `<circle cx="${100 + s * (hr + 1)}" cy="${cy + 16}" r="8" fill="none" stroke="${c}" stroke-width="3"/>`).join(""),
+  stars: (c, hr, cy) => [-1, 1].map((s) => `<text x="${100 + s * (hr + 1)}" y="${cy + 22}" font-size="18" text-anchor="middle" fill="${c}" stroke="${INK}" stroke-width=".6">★</text>`).join(""),
 };
 
 const hat = {
   none: () => "",
-  stars: (c) => `<polygon points="100,6 64,70 136,70" fill="${c}" stroke="${INK}" stroke-width="2"/>
-    <rect x="50" y="68" width="100" height="12" rx="6" fill="${c}" stroke="${INK}" stroke-width="2"/>
-    <g fill="#ffd166"><circle cx="97" cy="34" r="3"/><circle cx="106" cy="52" r="3"/><circle cx="86" cy="58" r="3"/></g>`,
-  dark: (c) => `<polygon points="96,10 66,72 134,72" fill="${c}"/>
-    <path d="M74 66 l40 -40 M84 70 l30 -32 M94 72 l20 -22 M70 56 l20 -24" stroke="#fff" stroke-opacity=".25" stroke-width="2"/>
-    <ellipse cx="100" cy="74" rx="46" ry="8" fill="${c}"/>`,
-  floppy: (c) => `<path d="M64 74 Q70 20 112 18 Q122 10 140 24 Q120 30 130 74Z" fill="${c}" stroke="${INK}" stroke-width="2"/>
-    <rect x="52" y="68" width="96" height="12" rx="6" fill="${c}" stroke="${INK}" stroke-width="2"/>
-    <circle cx="140" cy="24" r="6" fill="#ffd166"/>`,
+  stars: (c) => `<polygon points="100,2 60,76 140,76" fill="${c}" stroke="${INK}" stroke-width="2"/>
+    <rect x="46" y="72" width="108" height="13" rx="6" fill="${c}" stroke="${INK}" stroke-width="2"/>
+    <g fill="#ffd166"><circle cx="97" cy="32" r="3"/><circle cx="108" cy="52" r="3"/><circle cx="85" cy="60" r="3"/></g>`,
+  dark: (c) => `<polygon points="96,6 62,78 138,78" fill="${c}"/>
+    <path d="M70 72 l40 -42 M80 76 l30 -34 M92 78 l20 -24 M66 60 l22 -26" stroke="#fff" stroke-opacity=".25" stroke-width="2"/>
+    <ellipse cx="100" cy="80" rx="50" ry="8" fill="${c}"/>`,
+  floppy: (c) => `<path d="M60 80 Q66 24 110 20 Q122 10 142 26 Q120 34 134 80Z" fill="${c}" stroke="${INK}" stroke-width="2"/>
+    <rect x="48" y="74" width="104" height="13" rx="6" fill="${c}" stroke="${INK}" stroke-width="2"/>
+    <circle cx="142" cy="26" r="6" fill="#ffd166"/>`,
 };
 
 const outfit = {
-  dress: (c) => `<path d="M100 140 Q62 148 48 250 L152 250 Q138 148 100 140Z" fill="${c}" stroke="${INK}" stroke-width="2"/>
-    <circle cx="100" cy="148" r="5" fill="#ffd166"/>`,
-  cape: (c) => `<path d="M100 140 Q40 140 32 235 Q70 250 90 215 L100 190 L110 215 Q130 250 168 235 Q160 140 100 140Z" fill="${c}" stroke="${INK}" stroke-width="2"/>
-    <circle cx="100" cy="146" r="6" fill="#ffd166" stroke="${INK}"/>`,
-  sidecape: (c) => `<path d="M80 142 Q60 150 62 245 L150 250 Q142 160 112 142Z" fill="${c}" stroke="${INK}" stroke-width="2"/>
-    <path d="M100 150 L98 230" stroke="${INK}" stroke-width="2"/>
-    <polygon points="86,146 94,146 90,154" fill="#ffd166"/>`,
-  tunic: (c) => `<path d="M72 146 L52 190 M128 146 L148 190" stroke="${c}" stroke-width="12" stroke-linecap="round"/>
-    <path d="M72 142 L128 142 L136 200 L64 200Z" fill="${c}" stroke="${INK}" stroke-width="2"/>
-    <path d="M72 200 L82 250 L98 250 L100 205 L102 250 L118 250 L128 200Z" fill="#4a3a7a" stroke="${INK}" stroke-width="2"/>`,
+  dress: (c) => `<path d="M100 152 Q66 156 56 224 L144 224 Q134 156 100 152Z" fill="${c}" stroke="${INK}" stroke-width="2"/>
+    <circle cx="100" cy="160" r="5" fill="#ffd166"/>`,
+  cape: (c) => `<path d="M100 152 Q50 152 44 222 Q76 232 92 210 L100 196 L108 210 Q124 232 156 222 Q150 152 100 152Z" fill="${c}" stroke="${INK}" stroke-width="2"/>
+    <circle cx="100" cy="158" r="6" fill="#ffd166" stroke="${INK}"/>`,
+  sidecape: (c) => `<path d="M82 154 Q64 160 66 226 L142 226 Q136 166 112 154Z" fill="${c}" stroke="${INK}" stroke-width="2"/>
+    <path d="M100 160 L98 220" stroke="${INK}" stroke-width="2"/>
+    <polygon points="88,158 96,158 92,166" fill="#ffd166"/>`,
+  tunic: (c) => `<path d="M78 158 L60 196 M122 158 L140 196" stroke="${c}" stroke-width="12" stroke-linecap="round"/>
+    <path d="M76 152 L124 152 L130 206 L70 206Z" fill="${c}" stroke="${INK}" stroke-width="2"/>
+    <path d="M72 206 L128 206 L130 222 L104 222 L100 212 L96 222 L70 222Z" fill="#4a3a7a" stroke="${INK}" stroke-width="2"/>`,
 };
 
 const face = {
-  happy: (rx) => `<circle cx="${100 - rx}" cy="104" r="3.2" fill="${INK}"/><circle cx="${100 + rx}" cy="104" r="3.2" fill="${INK}"/>
-    <path d="M90 122 Q100 132 110 122" stroke="#c0392b" stroke-width="3" fill="none" stroke-linecap="round"/>`,
-  wink: (rx) => `<circle cx="${100 - rx}" cy="104" r="3.2" fill="${INK}"/><path d="M${95 + rx} 104 h10" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
-    <path d="M88 121 Q100 134 112 121Z" fill="#c0392b"/>`,
-  calm: (rx) => `<path d="M${95 - rx} 104 q5 -5 10 0 M${95 + rx} 104 q5 -5 10 0" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <path d="M92 124 h16" stroke="#c0392b" stroke-width="3" stroke-linecap="round"/>`,
-  surprised: (rx) => `<circle cx="${100 - rx}" cy="103" r="4.5" fill="#fff" stroke="${INK}" stroke-width="2"/><circle cx="${100 + rx}" cy="103" r="4.5" fill="#fff" stroke="${INK}" stroke-width="2"/>
-    <circle cx="${100 - rx}" cy="103" r="1.8" fill="${INK}"/><circle cx="${100 + rx}" cy="103" r="1.8" fill="${INK}"/>
-    <ellipse cx="100" cy="125" rx="5" ry="6" fill="#c0392b"/>`,
+  happy: (rx, cy) => `<circle cx="${100 - rx}" cy="${cy}" r="4.2" fill="${INK}"/><circle cx="${100 + rx}" cy="${cy}" r="4.2" fill="${INK}"/>
+    <circle cx="${100 - rx - 1}" cy="${cy - 1.5}" r="1.3" fill="#fff"/><circle cx="${100 + rx - 1}" cy="${cy - 1.5}" r="1.3" fill="#fff"/>
+    <circle cx="${100 - rx - 6}" cy="${cy + 12}" r="6" fill="#ff8aa8" opacity=".45"/><circle cx="${100 + rx + 6}" cy="${cy + 12}" r="6" fill="#ff8aa8" opacity=".45"/>
+    <path d="M90 ${cy + 14} Q100 ${cy + 25} 110 ${cy + 14}" stroke="#c0392b" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+  wink: (rx, cy) => `<circle cx="${100 - rx}" cy="${cy}" r="4.2" fill="${INK}"/><path d="M${rx + 94} ${cy} h12" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="${100 - rx - 6}" cy="${cy + 12}" r="6" fill="#ff8aa8" opacity=".45"/><circle cx="${100 + rx + 6}" cy="${cy + 12}" r="6" fill="#ff8aa8" opacity=".45"/>
+    <path d="M88 ${cy + 13} Q100 ${cy + 28} 112 ${cy + 13}Z" fill="#c0392b"/>`,
+  calm: (rx, cy) => `<path d="M${94 - rx} ${cy} q6 -6 12 0 M${88 + rx} ${cy} q6 -6 12 0" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="${100 - rx - 6}" cy="${cy + 12}" r="6" fill="#ff8aa8" opacity=".45"/><circle cx="${100 + rx + 6}" cy="${cy + 12}" r="6" fill="#ff8aa8" opacity=".45"/>
+    <path d="M93 ${cy + 17} Q100 ${cy + 21} 107 ${cy + 17}" stroke="#c0392b" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+  surprised: (rx, cy) => `<circle cx="${100 - rx}" cy="${cy}" r="5.5" fill="#fff" stroke="${INK}" stroke-width="2"/><circle cx="${100 + rx}" cy="${cy}" r="5.5" fill="#fff" stroke="${INK}" stroke-width="2"/>
+    <circle cx="${100 - rx}" cy="${cy}" r="2.2" fill="${INK}"/><circle cx="${100 + rx}" cy="${cy}" r="2.2" fill="${INK}"/>
+    <ellipse cx="100" cy="${cy + 20}" rx="5" ry="6.5" fill="#c0392b"/>`,
 };
 
 export const helpers = {
@@ -96,10 +125,12 @@ export const helpers = {
     <circle cx="90" cy="98" r="5" fill="#ff5fa2"/><circle cx="110" cy="98" r="5" fill="#ff5fa2"/>`,
 };
 
+// `only` limits a category to one character type.
 export const CATEGORIES = [
-  { key: "head", label: "Head", icon: "🙂", options: Object.keys(head), colorKey: "skin", colors: SKIN_COLORS },
+  { key: "head", label: "Head", icon: "🙂", options: Object.keys(HEAD), colorKey: "skin", colors: SKIN_COLORS },
   { key: "hair", label: "Hair", icon: "💇", options: Object.keys(hairBack), colorKey: "hairColor", colors: HAIR_COLORS },
-  { key: "beard", label: "Beard", icon: "🧔", options: Object.keys(beard), colorKey: "beardColor", colors: HAIR_COLORS },
+  { key: "earrings", label: "Earrings", icon: "💎", options: Object.keys(earrings), colorKey: "earringColor", colors: JEWEL_COLORS, only: "witch" },
+  { key: "beard", label: "Beard", icon: "🧔", options: Object.keys(beard), colorKey: "beardColor", colors: HAIR_COLORS, only: "wizard" },
   { key: "hat", label: "Hat", icon: "🎩", options: Object.keys(hat), colorKey: "hatColor", colors: CLOTH_COLORS },
   { key: "outfit", label: "Clothes", icon: "👗", options: Object.keys(outfit), colorKey: "outfitColor", colors: CLOTH_COLORS },
   { key: "face", label: "Face", icon: "😜", options: Object.keys(face) },
@@ -107,13 +138,17 @@ export const CATEGORIES = [
 ];
 
 export function characterSvgBody(c) {
-  const rx = c.head === "oval" ? 11 : c.head === "wide" ? 16 : 13;
-  return `${hairBack[c.hair](c.hairColor)}
+  const { rx: hr, cy } = HEAD[c.head];
+  const eyeX = Math.round(hr * 0.37);
+  const witch = c.type === "witch";
+  return `${hairBack[c.hair](c.hairColor, hr)}
+    ${legsAndShoes(c)}
     ${outfit[c.outfit](c.outfitColor)}
-    ${head[c.head](c)}
-    ${beard[c.beard] && c.beard === "long" ? beard.long(c.beardColor) : ""}
-    ${hairFront[c.hair] ? hairFront[c.hair](c.hairColor) : ""}
-    ${face[c.face](rx)}
-    ${c.beard === "moustache" ? beard.moustache(c.beardColor) : ""}
+    ${head(c)}
+    ${witch || c.beard === "moustache" ? "" : beard[c.beard](c.beardColor)}
+    ${hairFront[c.hair] ? hairFront[c.hair](c.hairColor, hr, cy) : ""}
+    ${face[c.face](eyeX, cy)}
+    ${!witch && c.beard === "moustache" ? beard.moustache(c.beardColor) : ""}
+    ${witch ? earrings[c.earrings](c.earringColor, hr, cy) : ""}
     ${hat[c.hat](c.hatColor)}`;
 }
