@@ -39,9 +39,34 @@
 
   <main>
     <section id="open-screen" data-scene="open">
-      <h1>Wizard-n-Which</h1>
+      <h1>Make your own witch or wizard adventures</h1>
       <p class="tagline">Design your witch or wizard. Do good deeds. Find a magical friend.</p>
-      <svg class="hero" viewBox="0 0 200 240" role="img" aria-label="A little witch"><use href="#witch"/></svg>
+      <svg class="hero" viewBox="0 0 400 240" role="img" aria-label="A moonlit magical night with two mysterious shadowy figures">
+        <defs>
+          <radialGradient id="moonGlow"><stop offset="0" stop-color="#fff3b0"/><stop offset="1" stop-color="#fff3b0" stop-opacity="0"/></radialGradient>
+          <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a6bd6" stop-opacity="0"/><stop offset="1" stop-color="#8a6bd6" stop-opacity=".75"/></linearGradient>
+        </defs>
+        <circle cx="200" cy="85" r="85" fill="url(#moonGlow)" opacity=".55"/>
+        <circle cx="200" cy="85" r="52" fill="#ffe9a8"/>
+        <circle cx="218" cy="72" r="9" fill="#f3d588"/><circle cx="188" cy="102" r="6" fill="#f3d588"/>
+        <g fill="#ffd34d">
+          <path d="M40 40l4 10 10 4-10 4-4 10-4-10-10-4 10-4z"/><path d="M350 30l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/>
+          <path d="M320 120l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/><path d="M85 110l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>
+          <circle cx="120" cy="30" r="2"/><circle cx="290" cy="50" r="2"/><circle cx="25" cy="85" r="2"/><circle cx="375" cy="85" r="2"/>
+        </g>
+        <path d="M0 200 Q100 165 200 190 T400 185 V240 H0z" fill="#1b1034"/>
+        <g fill="#0f0820">
+          <path d="M92 205 C86 150 98 125 112 115 L96 112 L112 70 L120 108 L140 112 C128 124 140 150 140 205z"/>
+          <ellipse cx="116" cy="112" rx="34" ry="7"/>
+          <path d="M276 205 C272 150 280 125 292 112 C288 95 296 90 300 90 C306 90 314 95 308 112 C322 126 326 150 322 205z"/>
+          <path d="M276 112 L300 40 L324 112z"/><ellipse cx="300" cy="112" rx="30" ry="6"/>
+        </g>
+        <g fill="#b6ff8a"><ellipse cx="108" cy="130" rx="3.5" ry="4.5"/><ellipse cx="124" cy="130" rx="3.5" ry="4.5"/></g>
+        <g fill="#7fe3ff"><ellipse cx="292" cy="132" rx="3.5" ry="4.5"/><ellipse cx="308" cy="132" rx="3.5" ry="4.5"/></g>
+        <text x="190" y="165" font-size="44" font-weight="800" fill="#ffd34d" opacity=".85" text-anchor="middle" font-family="system-ui,sans-serif">?</text>
+        <rect y="150" width="400" height="90" fill="url(#mist)"/>
+        <path d="M0 215 Q60 195 130 212 T260 208 T400 214 V240 H0z" fill="#8a6bd6" opacity=".35"/>
+      </svg>
       <button id="start" type="button">Start</button>
       <p id="phone-notice" hidden>This game is played with a keyboard. Please open it on a computer or laptop.</p>
     </section>
