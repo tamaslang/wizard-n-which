@@ -1,13 +1,10 @@
+import { drawCharacter } from "./character.js";
+
 const VIEW_W = 960;
 const VIEW_H = 540;
 const WORLD_W = 2400;
 const FLOOR_Y = 440;
 const SPEED = 260;
-
-const COLORS = {
-  witch: { robe: "#3b2a8f", hat: "#3b2a8f" },
-  wizard: { robe: "#7a1f2b", hat: "#7a1f2b" },
-};
 
 const keys = new Set();
 let frame = 0;
@@ -152,36 +149,10 @@ function drawDoor(ctx, x, label) {
 }
 
 function drawKid(ctx, player) {
-  const { robe, hat } = COLORS[player.character];
   const bob = Math.abs(Math.sin(player.walk)) * 4;
   ctx.save();
   ctx.translate(player.x, FLOOR_Y - bob);
   ctx.scale(player.dir, 1);
-
-  ctx.fillStyle = robe;
-  ctx.beginPath();
-  ctx.moveTo(0, -50);
-  ctx.quadraticCurveTo(-28, -48, -30, 0);
-  ctx.lineTo(30, 0);
-  ctx.quadraticCurveTo(28, -48, 0, -50);
-  ctx.fill();
-
-  ctx.fillStyle = "#ffe0bd";
-  ctx.beginPath();
-  ctx.arc(0, -68, 20, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = "#222";
-  ctx.beginPath();
-  ctx.arc(8, -70, 2.5, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = hat;
-  ctx.beginPath();
-  ctx.moveTo(-2, -122);
-  ctx.lineTo(-26, -78);
-  ctx.lineTo(24, -78);
-  ctx.closePath();
-  ctx.fill();
-  ctx.fillRect(-32, -80, 62, 6);
+  drawCharacter(ctx, player.character);
   ctx.restore();
 }

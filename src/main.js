@@ -1,5 +1,6 @@
 import { state, showScene } from "./scenes.js";
 import { startHome } from "./home.js";
+import { startDesigner } from "./designer.js";
 
 const isPhone = matchMedia("(pointer: coarse) and (max-width: 820px)").matches;
 
@@ -17,9 +18,15 @@ addEventListener("DOMContentLoaded", () => {
 
   for (const button of document.querySelectorAll(".choice")) {
     button.addEventListener("click", () => {
-      state.character = button.dataset.character;
-      showScene("home");
-      startHome(document.getElementById("game"), state.character);
+      state.character = { type: button.dataset.character, head: "round" };
+      showScene("designer");
+      startDesigner({
+        state,
+        onDone: () => {
+          showScene("home");
+          startHome(document.getElementById("game"), state.character);
+        },
+      });
     });
   }
 });
