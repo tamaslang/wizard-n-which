@@ -1,0 +1,27 @@
+:root { color-scheme: dark; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  font-family: system-ui, sans-serif;
+  background: radial-gradient(circle at 50% 30%, #3a2866, #14092b);
+  color: #f2eaff;
+}
+#open-screen { text-align: center; padding: 1rem; max-width: 640px; }
+h1 { font-size: clamp(2.2rem, 7vw, 4rem); margin: 0; color: #ffb703; }
+.tagline { color: #cdbdf2; }
+.witch { width: min(40vw, 220px); margin: 1rem 0; }
+button {
+  background: #ffb703;
+  color: #2a1b4d;
+  border: 0;
+  border-radius: 999px;
+  padding: .8rem 2.5rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+button:hover, button:focus-visible { background: #ffd166; }
+button:disabled { opacity: .4; cursor: not-allowed; }
+#phone-notice { margin-top: 1rem; color: #ff9ecb; }

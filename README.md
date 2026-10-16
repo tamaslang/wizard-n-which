@@ -1,13 +1,17 @@
 # Wizard-n-Which
 
-A browser-based step-by-step wizard for building a sandwich. Plain HTML/CSS/JS, no build step.
+A browser-based side-scrolling game about witches and wizards, designed by a 9-year-old. Plain HTML/CSS/ES modules, no build step. Desktop and laptop only.
+
+See [docs/game-design.md](docs/game-design.md) for the concept and milestones.
 
 ## Run
 
-Open `index.html` in a browser, or serve locally:
-
 ```sh
-python3 -m http.server 8000
+python3 -m http.server 8000   # then open http://localhost:8000
 ```
 
-Edit the `steps` array in `app.js` to change the wizard flow.
+## Test
+
+```sh
+npm ci && npx playwright install chromium && npm test
+```
