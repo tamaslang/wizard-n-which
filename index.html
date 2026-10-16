@@ -5,18 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Wizard-n-Which</title>
   <link rel="stylesheet" href="style.css">
+  <script type="module" src="src/main.js"></script>
 </head>
 <body>
-  <main>
-    <h1>🧙 Wizard-n-Which</h1>
-    <p class="tagline">Conjure your perfect sandwich, one spell at a time.</p>
-    <div id="progress" aria-hidden="true"></div>
-    <section id="step"></section>
-    <nav>
-      <button id="back">Back</button>
-      <button id="next">Next</button>
-    </nav>
+  <main id="open-screen">
+    <h1>Wizard-n-Which</h1>
+    <p class="tagline">Design your witch or wizard. Do good deeds. Find a magical friend.</p>
+
+    <svg class="witch" viewBox="0 0 200 240" role="img" aria-label="A little witch">
+      <polygon points="100,10 62,100 138,100" fill="#3b2a8f"/>
+      <ellipse cx="100" cy="102" rx="66" ry="10" fill="#3b2a8f"/>
+      <g fill="#ffd166">
+        <circle cx="95" cy="55" r="3.5"/><circle cx="108" cy="75" r="3.5"/><circle cx="86" cy="88" r="3.5"/>
+      </g>
+      <circle cx="100" cy="140" r="34" fill="#ffe0bd"/>
+      <circle cx="88" cy="136" r="3.5" fill="#222"/>
+      <circle cx="112" cy="136" r="3.5" fill="#222"/>
+      <path d="M90 151 Q100 159 110 151" stroke="#c0392b" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M100 175 Q60 180 55 232 L145 232 Q140 180 100 175Z" fill="#3b2a8f"/>
+      <circle cx="100" cy="182" r="5" fill="#ffd166"/>
+    </svg>
+
+    <button id="start" type="button">Start</button>
+    <p id="phone-notice" hidden>This game is played with a keyboard. Please open it on a computer or laptop.</p>
   </main>
-  <script src="app.js"></script>
 </body>
 </html>
