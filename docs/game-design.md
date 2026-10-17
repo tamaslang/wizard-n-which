@@ -10,8 +10,8 @@ Design your own witch or wizard — from the shape of the head all the way down 
 
 ## Platform
 
-- Browser game for **desktop and laptop** (keyboard controls).
-- **Not supported on phones.** Show a friendly message on small touch devices.
+- Browser game for **desktop, laptop and phones** (keyboard on desktop; on-screen buttons on touch devices).
+- On touch devices, ◀ ▶ walk and ▲ jumps / uses doors and seats / ▼ crouches. Landscape works best.
 - Modern, widely compatible web tech: plain HTML, CSS and ES modules; no build step.
 
 ## Game flow
@@ -42,7 +42,7 @@ Each milestone is split into small, separately committable features.
 
 | # | Milestone | Features |
 |---|-----------|----------|
-| 1 | **Open screen** | Title screen, basic witch drawing, start button, phone notice |
+| 1 | **Open screen** | Title screen, basic witch drawing, start button |
 | 2 | **Character choice** | Witch or wizard selection scene, scene manager |
 | 3 | **Home scene** | Kid character in the house, side-scrolling movement with keyboard |
 | 4 | **Character designer** | Head shape, then hair, clothes, hat, shoes and colours |

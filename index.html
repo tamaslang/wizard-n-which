@@ -67,7 +67,6 @@
         <path d="M0 215 Q60 195 130 212 T260 208 T400 214 V240 H0z" fill="#8a6bd6" opacity=".35"/>
       </svg>
       <button id="start" type="button">Start</button>
-      <p id="phone-notice" hidden>This game is played with a keyboard. Please open it on a computer or laptop.</p>
     </section>
 
     <section id="choice-screen" data-scene="choice" hidden>
@@ -102,6 +101,16 @@
 
     <section id="home-screen" data-scene="home" hidden>
       <canvas id="game" width="960" height="540" aria-label="Your home"></canvas>
+      <div id="touch" class="touch" aria-label="Controls">
+        <div class="pad">
+          <button type="button" data-key="ArrowLeft" aria-label="Left">◀</button>
+          <button type="button" data-key="ArrowRight" aria-label="Right">▶</button>
+        </div>
+        <div class="pad">
+          <button type="button" data-key="ArrowDown" aria-label="Crouch">▼</button>
+          <button type="button" data-key="ArrowUp" aria-label="Jump, enter or sit">▲</button>
+        </div>
+      </div>
       <p class="hint">Move with ← → or A / D · Jump with ↑, W or Space (↑ at a door or seat uses it) · Crouch with ↓ or S</p>
     </section>
   </main>
