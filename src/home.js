@@ -22,7 +22,7 @@ const ROOMS = {
     draw: drawHome,
   },
   mum: {
-    width: 1500,
+    width: 1700,
     doors: [{ id: "home", x: 150, label: "Back", to: "home", arrive: "mum" }],
     draw: drawMumRoom,
   },
@@ -180,6 +180,7 @@ function drawMumRoom(ctx) {
   drawCat(ctx, 760, FLOOR_Y);
   drawChair(ctx, 1010);
   drawMirror(ctx, 1160, FLOOR_Y - 70);
+  drawBed(ctx, 1300);
   drawDoor(ctx, ROOMS.mum.doors[0].x, "Back");
 }
 
@@ -306,6 +307,27 @@ function drawChair(ctx, x) {
   ctx.fillRect(x + 4, FLOOR_Y - 60, 8, 60);
   ctx.fillRect(x + 56, FLOOR_Y - 60, 8, 60);
   ctx.fillRect(x + 30, FLOOR_Y - 60, 6, 60);
+}
+
+function drawBed(ctx, x) {
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(x, FLOOR_Y - 120, 20, 120);
+  ctx.fillRect(x + 280, FLOOR_Y - 75, 20, 75);
+  ctx.fillRect(x, FLOOR_Y - 55, 300, 20);
+  ctx.fillStyle = "#6b4fbf";
+  ctx.beginPath();
+  ctx.roundRect(x + 20, FLOOR_Y - 100, 260, 48, 12);
+  ctx.fill();
+  ctx.fillStyle = "#ffd166";
+  for (let i = 0; i < 4; i++) {
+    ctx.beginPath();
+    ctx.arc(x + 70 + i * 60, FLOOR_Y - 76, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = "#f2eaff";
+  ctx.beginPath();
+  ctx.roundRect(x + 24, FLOOR_Y - 118, 75, 30, 12);
+  ctx.fill();
 }
 
 function drawMirror(ctx, x, y) {
