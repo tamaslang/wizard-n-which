@@ -15,8 +15,16 @@ const DOOR_W = 130;
 const ROOMS = {
   home: {
     width: 2400,
-    doors: [{ x: 2000, label: "Out", to: "outside", arrive: "home" }],
+    doors: [
+      { id: "mum", x: 1700, label: "Mum", to: "mum", arrive: "home" },
+      { id: "out", x: 2000, label: "Out", to: "outside", arrive: "home" },
+    ],
     draw: drawHome,
+  },
+  mum: {
+    width: 1700,
+    doors: [{ id: "home", x: 150, label: "Back", to: "home", arrive: "mum" }],
+    draw: drawMumRoom,
   },
   outside: {
     width: 2400,
@@ -24,7 +32,6 @@ const ROOMS = {
     draw: drawOutside,
   },
 };
-ROOMS.home.doors[0].id = "out";
 
 const doorCentre = (door) => door.x + DOOR_W / 2;
 const nearDoor = (player) =>
@@ -137,7 +144,7 @@ function drawHome(ctx) {
   drawShelf(ctx, 500);
   drawCauldron(ctx, 1000);
   drawBroom(ctx, 1400);
-  drawDoor(ctx, ROOMS.home.doors[0].x, "Out");
+  for (const door of ROOMS.home.doors) drawDoor(ctx, door.x, door.label);
 }
 
 function drawOutside(ctx) {
@@ -157,6 +164,183 @@ function drawOutside(ctx) {
   ctx.fillStyle = "#2f6b4a";
   ctx.fillRect(0, FLOOR_Y, w, VIEW_H - FLOOR_Y);
   drawDoor(ctx, ROOMS.outside.doors[0].x, "Home");
+}
+
+function drawMumRoom(ctx) {
+  const w = ROOMS.mum.width;
+  ctx.fillStyle = "#5b3a6e";
+  ctx.fillRect(0, 0, w, FLOOR_Y);
+  ctx.fillStyle = "#6b4a2b";
+  ctx.fillRect(0, FLOOR_Y, w, VIEW_H - FLOOR_Y);
+
+  drawWeb(ctx, 40, 0);
+  drawCabinet(ctx, 650);
+  drawHangingRack(ctx, 900);
+  drawFireplace(ctx, 620);
+  drawCat(ctx, 760, FLOOR_Y);
+  drawChair(ctx, 1010);
+  drawMirror(ctx, 1160, FLOOR_Y - 70);
+  drawBed(ctx, 1300);
+  drawDoor(ctx, ROOMS.mum.doors[0].x, "Back");
+}
+
+function drawCabinet(ctx, x) {
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(x, 70, 240, 230);
+  ctx.fillStyle = "#5b3f24";
+  ctx.fillRect(x + 8, 78, 224, 214);
+  ctx.fillStyle = "#8a5a2b";
+  ctx.fillRect(x + 8, 160, 224, 8);
+  ctx.fillRect(x + 8, 235, 224, 8);
+  const flask = (cx, cy, r, color) => {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(cx - r / 4, cy - r * 1.7, r / 2, r);
+  };
+  flask(x + 55, 140, 22, "#ff5fa2");
+  flask(x + 120, 142, 17, "#5fd0ff");
+  flask(x + 180, 143, 14, "#7dff8a");
+  ctx.fillStyle = "#c9b8ee";
+  ctx.beginPath();
+  ctx.roundRect(x + 35, 205, 45, 30, [0, 0, 18, 18]);
+  ctx.roundRect(x + 110, 205, 45, 30, [0, 0, 18, 18]);
+  ctx.fill();
+  ctx.fillStyle = "#ffd166";
+  ctx.beginPath();
+  ctx.arc(x + 70, 280, 8, 0, Math.PI * 2);
+  ctx.arc(x + 130, 280, 8, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawHangingRack(ctx, x) {
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(x, 70, 190, 230);
+  ctx.fillStyle = "#4a3278";
+  ctx.fillRect(x + 8, 78, 174, 214);
+  const rails = [100, 170, 240];
+  rails.forEach((y, row) => {
+    ctx.fillStyle = "#8a5a2b";
+    ctx.fillRect(x + 8, y, 174, 6);
+    for (let i = 0; i < 4 - (row === 2 ? 1 : 0); i++) {
+      const hx = x + 28 + i * 42;
+      ctx.strokeStyle = "#d8cff0";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(hx, y + 6);
+      ctx.lineTo(hx, y + 36);
+      ctx.stroke();
+      ctx.fillStyle = ["#ffd166", "#ff5fa2", "#5fd0ff", "#7dff8a"][(i + row) % 4];
+      ctx.beginPath();
+      ctx.arc(hx, y + 44, 9, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+}
+
+function drawFireplace(ctx, x) {
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(x - 30, 300, 520, 20);
+  ctx.fillStyle = "#2a1a2e";
+  ctx.fillRect(x, 320, 20, FLOOR_Y - 320);
+  ctx.fillRect(x + 440, 320, 20, FLOOR_Y - 320);
+  ctx.fillStyle = "#241530";
+  ctx.fillRect(x + 20, 320, 420, FLOOR_Y - 320);
+  ctx.strokeStyle = "#8a5a2b";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(x + 150, 320);
+  ctx.lineTo(x + 150, 385);
+  ctx.stroke();
+  ctx.fillStyle = "#c9a227";
+  ctx.beginPath();
+  ctx.moveTo(x + 135, FLOOR_Y - 5);
+  ctx.lineTo(x + 165, FLOOR_Y - 5);
+  ctx.lineTo(x + 150, FLOOR_Y - 55);
+  ctx.closePath();
+  ctx.fillStyle = "#8a5a2b";
+  ctx.fillRect(x + 147, 320, 6, 100);
+  ctx.fillStyle = "#c9a227";
+  ctx.beginPath();
+  ctx.moveTo(x + 135, 420);
+  ctx.lineTo(x + 165, 420);
+  ctx.lineTo(x + 150, 372);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawCat(ctx, x, floor) {
+  ctx.fillStyle = "#1c1c26";
+  ctx.beginPath();
+  ctx.ellipse(x, floor - 22, 48, 20, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(x - 45, floor - 38, 20, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(x - 62, floor - 52);
+  ctx.lineTo(x - 58, floor - 72);
+  ctx.lineTo(x - 46, floor - 56);
+  ctx.moveTo(x - 44, floor - 56);
+  ctx.lineTo(x - 32, floor - 72);
+  ctx.lineTo(x - 28, floor - 50);
+  ctx.fill();
+  ctx.strokeStyle = "#1c1c26";
+  ctx.lineWidth = 8;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(x + 45, floor - 22);
+  ctx.quadraticCurveTo(x + 85, floor - 30, x + 80, floor - 70);
+  ctx.stroke();
+  ctx.fillStyle = "#7dff8a";
+  ctx.beginPath();
+  ctx.arc(x - 52, floor - 40, 3, 0, Math.PI * 2);
+  ctx.arc(x - 38, floor - 40, 3, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawChair(ctx, x) {
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(x + 54, FLOOR_Y - 160, 12, 160);
+  ctx.fillRect(x, FLOOR_Y - 70, 70, 10);
+  ctx.fillRect(x + 4, FLOOR_Y - 60, 8, 60);
+  ctx.fillRect(x + 56, FLOOR_Y - 60, 8, 60);
+  ctx.fillRect(x + 30, FLOOR_Y - 60, 6, 60);
+}
+
+function drawBed(ctx, x) {
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(x, FLOOR_Y - 120, 20, 120);
+  ctx.fillRect(x + 280, FLOOR_Y - 75, 20, 75);
+  ctx.fillRect(x, FLOOR_Y - 55, 300, 20);
+  ctx.fillStyle = "#6b4fbf";
+  ctx.beginPath();
+  ctx.roundRect(x + 20, FLOOR_Y - 100, 260, 48, 12);
+  ctx.fill();
+  ctx.fillStyle = "#ffd166";
+  for (let i = 0; i < 4; i++) {
+    ctx.beginPath();
+    ctx.arc(x + 70 + i * 60, FLOOR_Y - 76, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = "#f2eaff";
+  ctx.beginPath();
+  ctx.roundRect(x + 24, FLOOR_Y - 118, 75, 30, 12);
+  ctx.fill();
+}
+
+function drawMirror(ctx, x, y) {
+  ctx.fillStyle = "#c9a227";
+  ctx.beginPath();
+  ctx.arc(x, y, 42, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#a8d8ff";
+  ctx.beginPath();
+  ctx.arc(x, y, 33, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#c9a227";
+  ctx.fillRect(x - 6, y + 40, 12, 40);
 }
 
 function drawTree(ctx, x) {
