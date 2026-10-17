@@ -7,13 +7,15 @@ const FLOOR_Y = 440;
 const SPEED = 260;
 const KID_SCALE = 0.5;
 const HELPER_SCALE = 0.4;
+const JUMP_SPEED = 620;
+const GRAVITY = 1700;
 
 const keys = new Set();
 let frame = 0;
 
 addEventListener("keydown", (e) => {
   keys.add(e.code);
-  if (e.code.startsWith("Arrow")) e.preventDefault();
+  if (e.code.startsWith("Arrow") || e.code === "Space") e.preventDefault();
 });
 addEventListener("keyup", (e) => keys.delete(e.code));
 addEventListener("blur", () => keys.clear());
@@ -29,7 +31,7 @@ export async function startHome(canvas, character) {
   cancelAnimationFrame(frame);
   const ctx = canvas.getContext("2d");
   const player = {
-    x: 200, dir: 1, walk: 0, helperX: 130,
+    x: 200, dir: 1, walk: 0, helperX: 130, y: 0, vy: 0,
     image: await loadSvg(characterSvg(character)),
     helperKind: character.helper,
     helperImage: character.helper === "none" ? null : await loadSvg(helperSvg(character.helper)),
@@ -60,6 +62,13 @@ function update(player, dt) {
     player.x = Math.min(WORLD_W - 40, Math.max(40, player.x + move * SPEED * dt));
   } else {
     player.walk = 0;
+  }
+  const grounded = player.y === 0;
+  if (grounded && (keys.has("ArrowUp") || keys.has("KeyW") || keys.has("Space"))) player.vy = JUMP_SPEED;
+  if (!grounded || player.vy > 0) {
+    player.vy -= GRAVITY * dt;
+    player.y = Math.max(0, player.y + player.vy * dt);
+    if (player.y === 0) player.vy = 0;
   }
   const target = player.x - player.dir * 75;
   player.helperX += (target - player.helperX) * Math.min(1, dt * 5);
@@ -165,7 +174,7 @@ function drawDoor(ctx, x, label) {
 }
 
 function drawKid(ctx, player) {
-  const bob = Math.abs(Math.sin(player.walk)) * 4;
+  const bob = player.y > 0 ? player.y : Math.abs(Math.sin(player.walk)) * 4;
   const s = KID_SCALE;
   ctx.save();
   ctx.translate(player.x, FLOOR_Y - bob);
