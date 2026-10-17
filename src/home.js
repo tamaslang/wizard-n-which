@@ -2,7 +2,6 @@ import { characterSvg, helperSvg } from "./character.js";
 
 const VIEW_W = 960;
 const VIEW_H = 540;
-const WORLD_W = 2400;
 const FLOOR_Y = 440;
 const SPEED = 260;
 const KID_SCALE = 0.5;
@@ -11,11 +10,32 @@ const JUMP_SPEED = 620;
 const GRAVITY = 1700;
 const CROUCH_SPEED = 0.4;
 const CROUCH_SQUASH = 0.65;
+const DOOR_W = 130;
+
+const ROOMS = {
+  home: {
+    width: 2400,
+    doors: [{ x: 2000, label: "Out", to: "outside", arrive: "home" }],
+    draw: drawHome,
+  },
+  outside: {
+    width: 2400,
+    doors: [{ id: "home", x: 300, label: "Home", to: "home", arrive: "out" }],
+    draw: drawOutside,
+  },
+};
+ROOMS.home.doors[0].id = "out";
+
+const doorCentre = (door) => door.x + DOOR_W / 2;
+const nearDoor = (player) =>
+  ROOMS[player.room].doors.find((d) => Math.abs(player.x - doorCentre(d)) < DOOR_W / 2);
 
 const keys = new Set();
+const tapped = new Set();
 let frame = 0;
 
 addEventListener("keydown", (e) => {
+  if (!e.repeat) tapped.add(e.code);
   keys.add(e.code);
   if (e.code.startsWith("Arrow") || e.code === "Space") e.preventDefault();
 });
@@ -33,7 +53,7 @@ export async function startHome(canvas, character) {
   cancelAnimationFrame(frame);
   const ctx = canvas.getContext("2d");
   const player = {
-    x: 200, dir: 1, walk: 0, helperX: 130, y: 0, vy: 0, crouch: false,
+    room: "home", x: 200, dir: 1, walk: 0, helperX: 130, y: 0, vy: 0, crouch: false,
     image: await loadSvg(characterSvg(character)),
     helperKind: character.helper,
     helperImage: character.helper === "none" ? null : await loadSvg(helperSvg(character.helper)),
@@ -64,12 +84,18 @@ function update(player, dt) {
   if (move) {
     player.dir = move;
     player.walk += dt * 10;
-    player.x = Math.min(WORLD_W - 40, Math.max(40, player.x + move * speed * dt));
+    player.x = Math.min(ROOMS[player.room].width - 40, Math.max(40, player.x + move * speed * dt));
   } else {
     player.walk = 0;
   }
   const grounded = player.y === 0;
-  if (grounded && !player.crouch && (keys.has("ArrowUp") || keys.has("KeyW") || keys.has("Space"))) player.vy = JUMP_SPEED;
+  const UP_KEYS = ["ArrowUp", "KeyW", "Space"];
+  const up = UP_KEYS.some((k) => keys.has(k));
+  const upPressed = UP_KEYS.some((k) => tapped.has(k));
+  tapped.clear();
+  const door = nearDoor(player);
+  if (grounded && !player.crouch && door && upPressed) enterDoor(player, door);
+  else if (grounded && !player.crouch && !door && up) player.vy = JUMP_SPEED;
   if (!grounded || player.vy > 0) {
     player.vy -= GRAVITY * dt;
     player.y = Math.max(0, player.y + player.vy * dt);
@@ -79,27 +105,74 @@ function update(player, dt) {
   player.helperX += (target - player.helperX) * Math.min(1, dt * 5);
 }
 
+function enterDoor(player, door) {
+  const target = ROOMS[door.to];
+  const arrival = target.doors.find((d) => d.id === door.arrive);
+  player.room = door.to;
+  player.x = doorCentre(arrival);
+  player.helperX = player.x - 40;
+  player.dir = 1;
+}
+
 function draw(ctx, player) {
-  const camX = Math.min(WORLD_W - VIEW_W, Math.max(0, player.x - VIEW_W / 2));
+  const room = ROOMS[player.room];
+  const camX = Math.min(room.width - VIEW_W, Math.max(0, player.x - VIEW_W / 2));
   ctx.clearRect(0, 0, VIEW_W, VIEW_H);
   ctx.save();
   ctx.translate(-camX, 0);
-  drawRoom(ctx);
+  room.draw(ctx);
   drawKid(ctx, player);
+  if (nearDoor(player)) drawDoorHint(ctx, player);
   ctx.restore();
 }
 
-function drawRoom(ctx) {
+function drawHome(ctx) {
+  const w = ROOMS.home.width;
   ctx.fillStyle = "#4a3278";
-  ctx.fillRect(0, 0, WORLD_W, FLOOR_Y);
+  ctx.fillRect(0, 0, w, FLOOR_Y);
   ctx.fillStyle = "#6b4a2b";
-  ctx.fillRect(0, FLOOR_Y, WORLD_W, VIEW_H - FLOOR_Y);
+  ctx.fillRect(0, FLOOR_Y, w, VIEW_H - FLOOR_Y);
 
   drawWeb(ctx, 40, 0);
   drawShelf(ctx, 500);
   drawCauldron(ctx, 1000);
   drawBroom(ctx, 1400);
-  drawDoor(ctx, 2000, "Out");
+  drawDoor(ctx, ROOMS.home.doors[0].x, "Out");
+}
+
+function drawOutside(ctx) {
+  const w = ROOMS.outside.width;
+  const sky = ctx.createLinearGradient(0, 0, 0, FLOOR_Y);
+  sky.addColorStop(0, "#1b1446");
+  sky.addColorStop(1, "#5a3f8f");
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, w, FLOOR_Y);
+  ctx.fillStyle = "#ffe9a8";
+  ctx.beginPath();
+  ctx.arc(1200, 110, 50, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#ffd34d";
+  for (let x = 100; x < w; x += 230) ctx.fillRect(x, 40 + ((x * 7) % 120), 4, 4);
+  for (let x = 700; x < w; x += 450) drawTree(ctx, x);
+  ctx.fillStyle = "#2f6b4a";
+  ctx.fillRect(0, FLOOR_Y, w, VIEW_H - FLOOR_Y);
+  drawDoor(ctx, ROOMS.outside.doors[0].x, "Home");
+}
+
+function drawTree(ctx, x) {
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(x - 12, FLOOR_Y - 120, 24, 120);
+  ctx.fillStyle = "#1f5a3a";
+  ctx.beginPath();
+  ctx.arc(x, FLOOR_Y - 150, 70, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawDoorHint(ctx, player) {
+  ctx.fillStyle = "#ffd166";
+  ctx.font = "bold 30px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("↑", player.x, FLOOR_Y - 150 + Math.sin(performance.now() / 200) * 4);
 }
 
 function drawWeb(ctx, x, y) {
@@ -166,7 +239,7 @@ function drawBroom(ctx, x) {
 function drawDoor(ctx, x, label) {
   ctx.fillStyle = "#2e1b12";
   ctx.beginPath();
-  ctx.roundRect(x, FLOOR_Y - 220, 130, 220, [65, 65, 0, 0]);
+  ctx.roundRect(x, FLOOR_Y - 220, DOOR_W, 220, [65, 65, 0, 0]);
   ctx.fill();
   ctx.fillStyle = "#ffd166";
   ctx.beginPath();
