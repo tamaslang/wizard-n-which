@@ -63,4 +63,18 @@ button {
 }
 button:hover, button:focus-visible { background: #ffd166; }
 button:disabled { opacity: .4; cursor: not-allowed; }
-#phone-notice { margin-top: 1rem; color: #ff9ecb; }
+
+.touch { display: none; width: min(96vw, 960px); justify-content: space-between; margin-top: .6rem; }
+.touch .pad { display: flex; gap: .8rem; }
+.touch button { width: 84px; height: 84px; font-size: 2rem; padding: 0; border-radius: 50%; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+.touch button.on { background: #ffd166; transform: scale(.94); }
+@media (pointer: coarse) {
+  .touch { display: flex; }
+  .hint { display: none; }
+  #home-screen { touch-action: none; }
+}
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
+  #game { width: auto; height: calc(100vh - 110px); max-width: 96vw; }
+  .touch button { width: 64px; height: 64px; font-size: 1.5rem; }
+}
+@media (max-width: 520px) { #preview { width: min(80vw, 340px); } }

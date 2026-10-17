@@ -57,6 +57,16 @@ addEventListener("keydown", (e) => {
 addEventListener("keyup", (e) => keys.delete(e.code));
 addEventListener("blur", () => keys.clear());
 
+for (const b of document.querySelectorAll("#touch [data-key]")) {
+  const code = b.dataset.key;
+  const down = (e) => { e.preventDefault(); b.setPointerCapture?.(e.pointerId); tapped.add(code); keys.add(code); b.classList.add("on"); };
+  const up = () => { keys.delete(code); b.classList.remove("on"); };
+  b.addEventListener("pointerdown", down);
+  b.addEventListener("pointerup", up);
+  b.addEventListener("pointercancel", up);
+  b.addEventListener("contextmenu", (e) => e.preventDefault());
+}
+
 async function loadSvg(svg) {
   const image = new Image();
   image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
