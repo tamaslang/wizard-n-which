@@ -15,8 +15,16 @@ const DOOR_W = 130;
 const ROOMS = {
   home: {
     width: 2400,
-    doors: [{ x: 2000, label: "Out", to: "outside", arrive: "home" }],
+    doors: [
+      { id: "mum", x: 1700, label: "Mum", to: "mum", arrive: "home" },
+      { id: "out", x: 2000, label: "Out", to: "outside", arrive: "home" },
+    ],
     draw: drawHome,
+  },
+  mum: {
+    width: 1400,
+    doors: [{ id: "home", x: 150, label: "Back", to: "home", arrive: "mum" }],
+    draw: drawMumRoom,
   },
   outside: {
     width: 2400,
@@ -24,7 +32,6 @@ const ROOMS = {
     draw: drawOutside,
   },
 };
-ROOMS.home.doors[0].id = "out";
 
 const doorCentre = (door) => door.x + DOOR_W / 2;
 const nearDoor = (player) =>
@@ -137,7 +144,7 @@ function drawHome(ctx) {
   drawShelf(ctx, 500);
   drawCauldron(ctx, 1000);
   drawBroom(ctx, 1400);
-  drawDoor(ctx, ROOMS.home.doors[0].x, "Out");
+  for (const door of ROOMS.home.doors) drawDoor(ctx, door.x, door.label);
 }
 
 function drawOutside(ctx) {
@@ -157,6 +164,65 @@ function drawOutside(ctx) {
   ctx.fillStyle = "#2f6b4a";
   ctx.fillRect(0, FLOOR_Y, w, VIEW_H - FLOOR_Y);
   drawDoor(ctx, ROOMS.outside.doors[0].x, "Home");
+}
+
+function drawMumRoom(ctx) {
+  const w = ROOMS.mum.width;
+  ctx.fillStyle = "#5b3a6e";
+  ctx.fillRect(0, 0, w, FLOOR_Y);
+  ctx.fillStyle = "#6b4a2b";
+  ctx.fillRect(0, FLOOR_Y, w, VIEW_H - FLOOR_Y);
+
+  // window with moon
+  ctx.fillStyle = "#1b1446";
+  ctx.fillRect(520, 90, 160, 170);
+  ctx.fillStyle = "#ffe9a8";
+  ctx.beginPath();
+  ctx.arc(600, 160, 30, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#3b2a1a";
+  ctx.lineWidth = 8;
+  ctx.strokeRect(520, 90, 160, 170);
+  ctx.beginPath();
+  ctx.moveTo(600, 90);
+  ctx.lineTo(600, 260);
+  ctx.moveTo(520, 175);
+  ctx.lineTo(680, 175);
+  ctx.stroke();
+
+  // rug
+  ctx.fillStyle = "#9b3d6b";
+  ctx.beginPath();
+  ctx.ellipse(500, FLOOR_Y + 40, 180, 22, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // bed
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(850, FLOOR_Y - 110, 20, 110);
+  ctx.fillRect(1130, FLOOR_Y - 70, 20, 70);
+  ctx.fillRect(850, FLOOR_Y - 55, 300, 20);
+  ctx.fillStyle = "#6b4fbf";
+  ctx.beginPath();
+  ctx.roundRect(870, FLOOR_Y - 95, 260, 45, 12);
+  ctx.fill();
+  ctx.fillStyle = "#f2eaff";
+  ctx.beginPath();
+  ctx.roundRect(875, FLOOR_Y - 110, 70, 28, 12);
+  ctx.fill();
+
+  // lamp
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(1218, FLOOR_Y - 90, 8, 90);
+  ctx.fillStyle = "#ffd166";
+  ctx.beginPath();
+  ctx.moveTo(1190, FLOOR_Y - 90);
+  ctx.lineTo(1254, FLOOR_Y - 90);
+  ctx.lineTo(1236, FLOOR_Y - 135);
+  ctx.lineTo(1208, FLOOR_Y - 135);
+  ctx.closePath();
+  ctx.fill();
+
+  drawDoor(ctx, ROOMS.mum.doors[0].x, "Back");
 }
 
 function drawTree(ctx, x) {
