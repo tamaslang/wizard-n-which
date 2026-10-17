@@ -9,6 +9,8 @@ const KID_SCALE = 0.5;
 const HELPER_SCALE = 0.4;
 const JUMP_SPEED = 620;
 const GRAVITY = 1700;
+const CROUCH_SPEED = 0.4;
+const CROUCH_SQUASH = 0.65;
 
 const keys = new Set();
 let frame = 0;
@@ -31,7 +33,7 @@ export async function startHome(canvas, character) {
   cancelAnimationFrame(frame);
   const ctx = canvas.getContext("2d");
   const player = {
-    x: 200, dir: 1, walk: 0, helperX: 130, y: 0, vy: 0,
+    x: 200, dir: 1, walk: 0, helperX: 130, y: 0, vy: 0, crouch: false,
     image: await loadSvg(characterSvg(character)),
     helperKind: character.helper,
     helperImage: character.helper === "none" ? null : await loadSvg(helperSvg(character.helper)),
@@ -56,15 +58,18 @@ function update(player, dt) {
   const left = keys.has("ArrowLeft") || keys.has("KeyA");
   const right = keys.has("ArrowRight") || keys.has("KeyD");
   const move = (right ? 1 : 0) - (left ? 1 : 0);
+  const down = keys.has("ArrowDown") || keys.has("KeyS");
+  player.crouch = down && player.y === 0;
+  const speed = player.crouch ? SPEED * CROUCH_SPEED : SPEED;
   if (move) {
     player.dir = move;
     player.walk += dt * 10;
-    player.x = Math.min(WORLD_W - 40, Math.max(40, player.x + move * SPEED * dt));
+    player.x = Math.min(WORLD_W - 40, Math.max(40, player.x + move * speed * dt));
   } else {
     player.walk = 0;
   }
   const grounded = player.y === 0;
-  if (grounded && (keys.has("ArrowUp") || keys.has("KeyW") || keys.has("Space"))) player.vy = JUMP_SPEED;
+  if (grounded && !player.crouch && (keys.has("ArrowUp") || keys.has("KeyW") || keys.has("Space"))) player.vy = JUMP_SPEED;
   if (!grounded || player.vy > 0) {
     player.vy -= GRAVITY * dt;
     player.y = Math.max(0, player.y + player.vy * dt);
@@ -174,11 +179,11 @@ function drawDoor(ctx, x, label) {
 }
 
 function drawKid(ctx, player) {
-  const bob = player.y > 0 ? player.y : Math.abs(Math.sin(player.walk)) * 4;
+  const bob = player.crouch ? 0 : player.y > 0 ? player.y : Math.abs(Math.sin(player.walk)) * 4;
   const s = KID_SCALE;
   ctx.save();
   ctx.translate(player.x, FLOOR_Y - bob);
-  ctx.scale(player.dir, 1);
+  ctx.scale(player.dir, player.crouch ? CROUCH_SQUASH : 1);
   ctx.drawImage(player.image, (-200 * s) / 2, -250 * s, 200 * s, 260 * s);
   ctx.restore();
 
