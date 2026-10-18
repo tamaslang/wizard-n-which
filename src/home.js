@@ -203,7 +203,37 @@ function drawOutside(ctx) {
   for (let x = 700; x < w; x += 450) drawTree(ctx, x);
   ctx.fillStyle = "#2f6b4a";
   ctx.fillRect(0, FLOOR_Y, w, VIEW_H - FLOOR_Y);
+  drawHouse(ctx, ROOMS.outside.doors[0].x + DOOR_W / 2);
   drawDoor(ctx, ROOMS.outside.doors[0].x, "Home");
+}
+
+function drawHouse(ctx, cx) {
+  const half = 260;
+  const top = FLOOR_Y - 300;
+  ctx.fillStyle = "#6b4a3a";
+  ctx.fillRect(cx - half, top, half * 2, 300);
+  ctx.fillStyle = "#5a3d30";
+  for (let y = top + 30; y < FLOOR_Y; y += 30) ctx.fillRect(cx - half, y, half * 2, 3);
+  ctx.fillStyle = "#4a2f6e";
+  ctx.beginPath();
+  ctx.moveTo(cx - half - 30, top + 6);
+  ctx.lineTo(cx, top - 130);
+  ctx.lineTo(cx + half + 30, top + 6);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = "#ffd34d";
+  ctx.beginPath();
+  ctx.arc(cx, top - 55, 10, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(cx + 130, top - 110, 36, 80);
+  for (const wx of [cx - 200, cx + 110]) {
+    ctx.fillStyle = "#ffe08a";
+    ctx.fillRect(wx, top + 70, 90, 80);
+    ctx.fillStyle = "#3b2a1a";
+    ctx.fillRect(wx + 43, top + 70, 4, 80);
+    ctx.fillRect(wx, top + 108, 90, 4);
+  }
 }
 
 function drawMumRoom(ctx) {
