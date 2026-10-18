@@ -13,6 +13,11 @@ const CROUCH_SQUASH = 0.65;
 const SIT_SQUASH = 0.8;
 const DOOR_W = 130;
 
+const SEATS = {
+  chair: { reach: 50, height: 70, dir: -1, dx: 35 },
+  bed: { reach: 170, height: 55, dir: 1, dx: 150 },
+};
+
 const ROOMS = {
   home: {
     width: 2400,
@@ -33,10 +38,40 @@ const ROOMS = {
   },
   outside: {
     width: 2400,
-    doors: [{ id: "home", x: 300, label: "Home", to: "home", arrive: "out" }],
+    doors: [
+      { id: "home", x: 300, label: "Home", to: "home", arrive: "out" },
+      { id: "n1", x: 1015, to: "pink", arrive: "out" },
+      { id: "n2", x: 1685, to: "blue", arrive: "out" },
+      { id: "n3", x: 2185, to: "yellow", arrive: "out" },
+    ],
     draw: drawOutside,
   },
+  pink: neighbourRoom("n1", "#7a5a8a", [drawShelf, 450], [drawCauldron, 900], [drawBed, 1000, "bed"]),
+  blue: neighbourRoom("n2", "#3a4f7a", [drawCabinet, 450], [drawChair, 900, "chair"], [drawMirror, 1050, null], [drawCat, 1200, null]),
+  yellow: neighbourRoom("n3", "#7a6a3a", [drawShelf, 450], [drawBroom, 800], [drawChair, 950, "chair"], [drawBed, 1050, "bed"]),
 };
+
+function neighbourRoom(arrive, wall, ...items) {
+  const width = 1500;
+  const seats = items
+    .filter(([, , kind]) => kind in SEATS)
+    .map(([, x, kind]) => ({ name: kind, x: x + SEATS[kind].dx, reach: SEATS[kind].reach, height: SEATS[kind].height, dir: SEATS[kind].dir }));
+  const door = { id: "out", x: 150, label: "Out", to: "outside", arrive };
+  return {
+    width,
+    doors: [door],
+    seats,
+    draw(ctx) {
+      ctx.fillStyle = wall;
+      ctx.fillRect(0, 0, width, FLOOR_Y);
+      ctx.fillStyle = "#6b4a2b";
+      ctx.fillRect(0, FLOOR_Y, width, VIEW_H - FLOOR_Y);
+      drawWeb(ctx, 40, 0);
+      for (const [fn, x] of items) fn === drawCat ? fn(ctx, x, FLOOR_Y) : fn === drawMirror ? fn(ctx, x, FLOOR_Y - 70) : fn(ctx, x);
+      drawDoor(ctx, door.x, door.label);
+    },
+  };
+}
 
 const nearSeat = (player) =>
   (ROOMS[player.room].seats ?? []).find((seat) => Math.abs(player.x - seat.x) < seat.reach);
