@@ -105,10 +105,11 @@ function update(player, dt) {
   const move = (right ? 1 : 0) - (left ? 1 : 0);
   const UP_KEYS = ["ArrowUp", "KeyW", "Space"];
   const upPressed = UP_KEYS.some((k) => tapped.has(k));
+  const downPressed = ["ArrowDown", "KeyS"].some((k) => tapped.has(k));
   tapped.clear();
 
   if (player.seat) {
-    if (move || upPressed) {
+    if (move || upPressed || downPressed) {
       player.seat = null;
       player.vy = JUMP_SPEED * 0.45;
       if (move) player.dir = move;
