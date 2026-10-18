@@ -200,21 +200,28 @@ function drawOutside(ctx) {
   ctx.fill();
   ctx.fillStyle = "#ffd34d";
   for (let x = 100; x < w; x += 230) ctx.fillRect(x, 40 + ((x * 7) % 120), 4, 4);
-  for (let x = 700; x < w; x += 450) drawTree(ctx, x);
+  for (const n of NEIGHBOURS) drawHouse(ctx, n.x, n);
+  for (const x of [760, 1420, 2020]) drawTree(ctx, x);
   ctx.fillStyle = "#2f6b4a";
   ctx.fillRect(0, FLOOR_Y, w, VIEW_H - FLOOR_Y);
   drawHouse(ctx, ROOMS.outside.doors[0].x + DOOR_W / 2);
   drawDoor(ctx, ROOMS.outside.doors[0].x, "Home");
 }
 
-function drawHouse(ctx, cx) {
-  const half = 260;
-  const top = FLOOR_Y - 300;
-  ctx.fillStyle = "#6b4a3a";
-  ctx.fillRect(cx - half, top, half * 2, 300);
-  ctx.fillStyle = "#5a3d30";
+const NEIGHBOURS = [
+  { x: 1080, half: 200, h: 250, wall: "#7a5a6a", roof: "#2f6b8a", door: "#ff9ecb" },
+  { x: 1750, half: 230, h: 320, wall: "#8a6a3a", roof: "#8a3a3a", door: "#4a8fd9" },
+  { x: 2250, half: 130, h: 230, wall: "#5a7a6a", roof: "#6a4a9a", door: "#ffd166" },
+];
+
+function drawHouse(ctx, cx, o = {}) {
+  const { half = 260, h = 300, wall = "#6b4a3a", roof = "#4a2f6e", door } = o;
+  const top = FLOOR_Y - h;
+  ctx.fillStyle = wall;
+  ctx.fillRect(cx - half, top, half * 2, h);
+  ctx.fillStyle = "#0003";
   for (let y = top + 30; y < FLOOR_Y; y += 30) ctx.fillRect(cx - half, y, half * 2, 3);
-  ctx.fillStyle = "#4a2f6e";
+  ctx.fillStyle = roof;
   ctx.beginPath();
   ctx.moveTo(cx - half - 30, top + 6);
   ctx.lineTo(cx, top - 130);
@@ -227,12 +234,19 @@ function drawHouse(ctx, cx) {
   ctx.fill();
   ctx.fillStyle = "#3b2a1a";
   ctx.fillRect(cx + 130, top - 110, 36, 80);
-  for (const wx of [cx - 200, cx + 110]) {
+  if (door) {
+    ctx.fillStyle = door;
+    ctx.beginPath();
+    ctx.roundRect(cx - 30, FLOOR_Y - 110, 60, 110, [30, 30, 0, 0]);
+    ctx.fill();
+  }
+  for (const wx of door ? [cx - half + 10, cx + half - 100] : [cx - 200, cx + 110]) {
+    const wy = top + (door ? 30 : 70);
     ctx.fillStyle = "#ffe08a";
-    ctx.fillRect(wx, top + 70, 90, 80);
+    ctx.fillRect(wx, wy, 90, 80);
     ctx.fillStyle = "#3b2a1a";
-    ctx.fillRect(wx + 43, top + 70, 4, 80);
-    ctx.fillRect(wx, top + 108, 90, 4);
+    ctx.fillRect(wx + 43, wy, 4, 80);
+    ctx.fillRect(wx, wy + 38, 90, 4);
   }
 }
 
