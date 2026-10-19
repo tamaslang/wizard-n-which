@@ -1,3 +1,4 @@
+import { sfx } from "./sound.js";
 import { characterSvg, helperSvg } from "./character.js";
 
 const VIEW_W = 960;
@@ -198,6 +199,7 @@ function update(player, dt) {
   if (player.seat) {
     if (move || upPressed || downPressed) {
       player.seat = null;
+      sfx.stand();
       player.vy = JUMP_SPEED * 0.45;
       if (move) player.dir = move;
     } else {
@@ -207,7 +209,9 @@ function update(player, dt) {
     }
   }
   const down = keys.has("ArrowDown") || keys.has("KeyS");
+  const wasCrouching = player.crouch;
   player.crouch = down && player.y === 0;
+  if (player.crouch && !wasCrouching) sfx.crouch();
   const speed = player.crouch ? SPEED * CROUCH_SPEED : SPEED;
   if (move) {
     player.dir = move;
@@ -216,22 +220,32 @@ function update(player, dt) {
   } else {
     player.walk = 0;
   }
+  const phase = Math.floor(player.walk / 3);
+  if (move && player.y === 0 && phase !== player.stepPhase) player.crouch ? sfx.softStep() : sfx.step();
+  player.stepPhase = move ? phase : 0;
   const grounded = player.y === 0;
   const up = UP_KEYS.some((k) => keys.has(k));
   const door = nearDoor(player);
   if (grounded && !player.crouch && door && upPressed) enterDoor(player, door);
   else if (grounded && !player.crouch && !door && upPressed && nearSeat(player)) sitDown(player, nearSeat(player));
-  else if (grounded && !player.crouch && !door && !nearSeat(player) && up) player.vy = JUMP_SPEED;
+  else if (grounded && !player.crouch && !door && !nearSeat(player) && up) {
+    player.vy = JUMP_SPEED;
+    sfx.jump();
+  }
   if (!grounded || player.vy > 0) {
     player.vy -= GRAVITY * dt;
     player.y = Math.max(0, player.y + player.vy * dt);
-    if (player.y === 0) player.vy = 0;
+    if (player.y === 0) {
+      player.vy = 0;
+      sfx.land();
+    }
   }
   const target = player.x - player.dir * 75;
   player.helperX += (target - player.helperX) * Math.min(1, dt * 5);
 }
 
 function sitDown(player, seat) {
+  sfx.sit();
   player.seat = seat;
   player.x = seat.x;
   player.y = seat.height;
@@ -241,6 +255,7 @@ function sitDown(player, seat) {
 }
 
 function enterDoor(player, door) {
+  sfx.door();
   const target = ROOMS[door.to];
   const arrival = target.doors.find((d) => d.id === door.arrive);
   player.room = door.to;
