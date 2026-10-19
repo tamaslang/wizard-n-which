@@ -14,10 +14,6 @@ const SIT_SQUASH = 0.8;
 const DOOR_W = 130;
 
 const ROOMS_MUM_WIDTH = 1700;
-const MUM_SEATS = [
-  { name: "chair", x: 1045, reach: 50, height: 70, dir: -1 },
-  { name: "bed", x: 1450, reach: 170, height: 55, dir: 1 },
-];
 
 const SEATS = {
   chair: { reach: 50, height: 70, dir: -1, dx: 35 },
@@ -52,30 +48,53 @@ const ROOMS = {
     ],
     draw: drawOutside,
   },
-  pinkMum: mumRoom("pink", "#8a4a7a"),
-  blueMum: mumRoom("blue", "#3f5a8a"),
-  yellowMum: mumRoom("yellow", "#8a7a3a"),
+  pinkMum: mumRoom("pink", "#8a4a7a", [drawShelf, 450], [drawCauldron, 850], [drawChair, 1000, "chair"], [drawMirror, 1150, null], [drawBed, 1300, "bed"]),
+  blueMum: mumRoom("blue", "#3f5a8a", [drawCabinet, 450], [drawFireplace, 420], [drawCat, 560, null], [drawHangingRack, 700], [drawChair, 1050, "chair"], [drawBed, 1250, "bed"]),
+  yellowMum: mumRoom("yellow", "#8a7a3a", [drawCabinet, 400], [drawFireplace, 370], [drawMirror, 780, null], [drawBroom, 950], [drawChair, 1100, "chair"], [drawBed, 1250, "bed"]),
   pink: neighbourRoom("n1", "pinkMum", "#7a5a8a", [drawShelf, 450], [drawCauldron, 900], [drawBed, 1000, "bed"]),
   blue: neighbourRoom("n2", "blueMum", "#3a4f7a", [drawCabinet, 450], [drawChair, 900, "chair"], [drawMirror, 1050, null], [drawCat, 1200, null]),
   yellow: neighbourRoom("n3", "yellowMum", "#7a6a3a", [drawShelf, 450], [drawBroom, 800], [drawChair, 950, "chair"], [drawBed, 1050, "bed"]),
 };
 
-function mumRoom(parent, wall) {
-  const width = ROOMS_MUM_WIDTH;
+function mumRoom(parent, wall, ...items) {
   const door = { id: "back", x: 150, label: "Back", to: parent, arrive: "mum" };
   return {
-    width,
+    width: ROOMS_MUM_WIDTH,
     doors: [door],
-    seats: MUM_SEATS,
-    draw: (ctx) => drawMumRoom(ctx, width, wall, door.x),
+    seats: seatsFor(items),
+    draw(ctx) {
+      paintRoom(ctx, ROOMS_MUM_WIDTH, wall);
+      furnish(ctx, items);
+      drawDoor(ctx, door.x, door.label);
+    },
   };
+}
+
+function seatsFor(items) {
+  return items
+    .filter(([, , kind]) => kind in SEATS)
+    .map(([, x, kind]) => ({ name: kind, x: x + SEATS[kind].dx, reach: SEATS[kind].reach, height: SEATS[kind].height, dir: SEATS[kind].dir }));
+}
+
+function paintRoom(ctx, width, wall) {
+  ctx.fillStyle = wall;
+  ctx.fillRect(0, 0, width, FLOOR_Y);
+  ctx.fillStyle = "#6b4a2b";
+  ctx.fillRect(0, FLOOR_Y, width, VIEW_H - FLOOR_Y);
+  drawWeb(ctx, 40, 0);
+}
+
+function furnish(ctx, items) {
+  for (const [fn, x] of items) {
+    if (fn === drawCat) fn(ctx, x, FLOOR_Y);
+    else if (fn === drawMirror) fn(ctx, x, FLOOR_Y - 70);
+    else fn(ctx, x);
+  }
 }
 
 function neighbourRoom(arrive, mumKey, wall, ...items) {
   const width = 1800;
-  const seats = items
-    .filter(([, , kind]) => kind in SEATS)
-    .map(([, x, kind]) => ({ name: kind, x: x + SEATS[kind].dx, reach: SEATS[kind].reach, height: SEATS[kind].height, dir: SEATS[kind].dir }));
+  const seats = seatsFor(items);
   const door = { id: "out", x: 150, label: "Out", to: "outside", arrive };
   const mumDoor = { id: "mum", x: 1500, label: "Mum", to: mumKey, arrive: "back" };
   return {
@@ -83,12 +102,8 @@ function neighbourRoom(arrive, mumKey, wall, ...items) {
     doors: [door, mumDoor],
     seats,
     draw(ctx) {
-      ctx.fillStyle = wall;
-      ctx.fillRect(0, 0, width, FLOOR_Y);
-      ctx.fillStyle = "#6b4a2b";
-      ctx.fillRect(0, FLOOR_Y, width, VIEW_H - FLOOR_Y);
-      drawWeb(ctx, 40, 0);
-      for (const [fn, x] of items) fn === drawCat ? fn(ctx, x, FLOOR_Y) : fn === drawMirror ? fn(ctx, x, FLOOR_Y - 70) : fn(ctx, x);
+      paintRoom(ctx, width, wall);
+      furnish(ctx, items);
       drawDoor(ctx, door.x, door.label);
       drawDoor(ctx, mumDoor.x, mumDoor.label);
     },
