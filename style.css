@@ -78,3 +78,5 @@ button:disabled { opacity: .4; cursor: not-allowed; }
   .touch button { width: 64px; height: 64px; font-size: 1.5rem; }
 }
 @media (max-width: 520px) { #preview { width: min(80vw, 340px); } }
+
+#mute { position: fixed; top: .5rem; right: .5rem; z-index: 10; width: 48px; height: 48px; padding: 0; border-radius: 50%; font-size: 1.4rem; background: #2a1b4d; }
