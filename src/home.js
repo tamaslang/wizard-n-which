@@ -52,10 +52,10 @@ const ROOMS = {
   pinkMum: mumRoom("pink", "#8a4a7a", [drawShelf, 450], [drawCauldron, 850], [drawChair, 1000, "chair"], [drawMirror, 1150, null], [drawBed, 1300, "bed"]),
   blueMum: mumRoom("blue", "#3f5a8a", [drawCabinet, 450], [drawFireplace, 420], [drawCat, 560, null], [drawHangingRack, 700], [drawChair, 1050, "chair"], [drawBed, 1250, "bed"]),
   yellowMum: mumRoom("yellow", "#8a7a3a", [drawCabinet, 400], [drawFireplace, 370], [drawMirror, 780, null], [drawBroom, 950], [drawChair, 1100, "chair"], [drawBed, 1250, "bed"]),
-  homeDad: dadRoom("home", "#3a4a6e", [drawCauldron, 450], [drawShelf, 650], [drawChair, 1000, "chair"], [drawBed, 1250, "bed"]),
-  pinkDad: dadRoom("pink", "#6e3a5a", [drawBroom, 450], [drawBed, 650, "bed"], [drawCauldron, 1100], [drawChair, 1300, "chair"]),
+  homeDad: dadRoom("home", "#3a4a6e", [drawCauldron, 450], [drawShelf, 650], [drawChair, 1000, "chair"], [drawBed, 1250, "bed", "#2f6fd0"]),
+  pinkDad: dadRoom("pink", "#6e3a5a", [drawBroom, 450], [drawBed, 650, "bed", "#c0392b"], [drawCauldron, 1100], [drawChair, 1300, "chair"]),
   blueDad: dadRoom("blue", "#2f4a5e", [drawShelf, 400], [drawChair, 800, "chair"], [drawHangingRack, 950], [drawCauldron, 1250], [drawBroom, 1450]),
-  yellowDad: dadRoom("yellow", "#6e5e2f", [drawCabinet, 450], [drawFireplace, 420], [drawBed, 900, "bed"], [drawMirror, 1280, null], [drawChair, 1400, "chair"]),
+  yellowDad: dadRoom("yellow", "#6e5e2f", [drawCabinet, 450], [drawFireplace, 420], [drawBed, 900, "bed", "#1f5a3a"], [drawMirror, 1280, null], [drawChair, 1400, "chair"]),
   pink: neighbourRoom("n1", "pinkMum", "pinkDad", "#7a5a8a", [drawShelf, 450], [drawCauldron, 900], [drawBed, 1000, "bed"]),
   blue: neighbourRoom("n2", "blueMum", "blueDad", "#3a4f7a", [drawCabinet, 450], [drawChair, 900, "chair"], [drawMirror, 1050, null], [drawCat, 1200, null]),
   yellow: neighbourRoom("n3", "yellowMum", "yellowDad", "#7a6a3a", [drawShelf, 450], [drawBroom, 800], [drawChair, 950, "chair"], [drawBed, 1050, "bed"]),
@@ -98,10 +98,10 @@ function paintRoom(ctx, width, wall) {
 }
 
 function furnish(ctx, items) {
-  for (const [fn, x] of items) {
+  for (const [fn, x, , colour] of items) {
     if (fn === drawCat) fn(ctx, x, FLOOR_Y);
     else if (fn === drawMirror) fn(ctx, x, FLOOR_Y - 70);
-    else fn(ctx, x);
+    else fn(ctx, x, colour);
   }
 }
 
@@ -480,12 +480,12 @@ function drawChair(ctx, x) {
   ctx.fillRect(x + 30, FLOOR_Y - 60, 6, 60);
 }
 
-function drawBed(ctx, x) {
+function drawBed(ctx, x, cover = "#6b4fbf") {
   ctx.fillStyle = "#3b2a1a";
   ctx.fillRect(x, FLOOR_Y - 120, 20, 120);
   ctx.fillRect(x + 280, FLOOR_Y - 75, 20, 75);
   ctx.fillRect(x, FLOOR_Y - 55, 300, 20);
-  ctx.fillStyle = "#6b4fbf";
+  ctx.fillStyle = cover;
   ctx.beginPath();
   ctx.roundRect(x + 20, FLOOR_Y - 100, 260, 48, 12);
   ctx.fill();
