@@ -52,38 +52,34 @@ function noise(dur, { vol = 0.1, freq = 800, delay = 0 } = {}) {
   src.start(t);
 }
 
-// A rusty hinge: high, thin squeaks made of rapid stick-slip pulses that glide up in pitch.
+// An old wooden door: a slow, rattly stick-slip "rrrrreeeak" with a wandering low pitch and a woody resonance.
 function creak() {
   if (muted) return;
   const a = audio();
   if (!a) return;
-  const t0 = a.currentTime;
-  const phrases = [[0.0, 0.55, 520, 1250], [0.7, 0.4, 700, 1500], [1.2, 0.35, 450, 1000]];
-  for (const [start, len, f0, f1] of phrases) {
-    let t = t0 + start;
-    while (t < t0 + start + len) {
-      const p = (t - t0 - start) / len;
-      const pulse = 0.012 + Math.random() * 0.012;
-      const osc = a.createOscillator();
-      osc.type = "sawtooth";
-      const f = f0 + (f1 - f0) * p + (Math.random() - 0.5) * 120;
-      osc.frequency.setValueAtTime(f, t);
-      osc.frequency.linearRampToValueAtTime(f * 1.08, t + pulse);
-      const filter = a.createBiquadFilter();
-      filter.type = "bandpass";
-      filter.frequency.value = 1800 + Math.random() * 600;
-      filter.Q.value = 5;
-      const g = a.createGain();
-      const vol = 0.07 * Math.sin(Math.PI * p) + 0.01;
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.linearRampToValueAtTime(vol, t + pulse * 0.3);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + pulse);
-      osc.connect(filter).connect(g).connect(a.destination);
-      osc.start(t);
-      osc.stop(t + pulse + 0.01);
-      t += pulse + 0.004 + Math.random() * 0.012;
-    }
+  const t = a.currentTime;
+  const dur = 1.7;
+  const osc = a.createOscillator();
+  osc.type = "sawtooth";
+  const amp = a.createGain();
+  amp.gain.setValueAtTime(0.0001, t);
+  let f = 70;
+  for (let x = 0; x < dur; x += 0.03) {
+    f = Math.min(150, Math.max(45, f + (Math.random() - 0.45) * 25));
+    const swing = Math.sin((x / dur) * Math.PI);
+    osc.frequency.linearRampToValueAtTime(f * (0.8 + swing * 0.5), t + x);
+    amp.gain.linearRampToValueAtTime((0.05 + Math.random() * 0.09) * (0.3 + swing), t + x);
   }
+  amp.gain.linearRampToValueAtTime(0.0001, t + dur);
+  const body = a.createBiquadFilter();
+  body.type = "bandpass";
+  body.Q.value = 7;
+  body.frequency.setValueAtTime(500, t);
+  body.frequency.linearRampToValueAtTime(950, t + dur * 0.5);
+  body.frequency.linearRampToValueAtTime(600, t + dur);
+  osc.connect(body).connect(amp).connect(a.destination);
+  osc.start(t);
+  osc.stop(t + dur + 0.05);
 }
 
 export const sfx = {
@@ -94,7 +90,7 @@ export const sfx = {
   crouch: () => tone(220, 0.1, { to: 140, vol: 0.1 }),
   sit: () => { tone(240, 0.12, { to: 150, vol: 0.14 }); tone(180, 0.1, { to: 120, vol: 0.1, delay: 0.08 }); },
   stand: () => tone(320, 0.12, { type: "triangle", to: 520, vol: 0.12 }),
-  door: () => { creak(); tone(90, 0.2, { to: 55, vol: 0.12, delay: 1.6 }); },
+  door: () => { creak(); tone(90, 0.2, { to: 55, vol: 0.12, delay: 1.75 }); },
   click: () => tone(660, 0.07, { type: "triangle", vol: 0.1 }),
 };
 
