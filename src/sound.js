@@ -52,40 +52,38 @@ function noise(dur, { vol = 0.1, freq = 800, delay = 0 } = {}) {
   src.start(t);
 }
 
-// A slow, wobbly, rusty-hinge creak: a sawtooth with uneven pitch and a scratchy filter.
+// A rusty hinge: high, thin squeaks made of rapid stick-slip pulses that glide up in pitch.
 function creak() {
   if (muted) return;
   const a = audio();
   if (!a) return;
-  const t = a.currentTime;
-  const dur = 1.0;
-  const osc = a.createOscillator();
-  osc.type = "sawtooth";
-  const pitches = [95, 150, 120, 210, 140, 260, 170, 110];
-  osc.frequency.setValueAtTime(pitches[0], t);
-  pitches.forEach((f, i) => osc.frequency.linearRampToValueAtTime(f * (0.95 + Math.random() * 0.1), t + (i / (pitches.length - 1)) * dur));
-  const lfo = a.createOscillator();
-  const lfoGain = a.createGain();
-  lfo.frequency.value = 13;
-  lfoGain.gain.value = 18;
-  lfo.connect(lfoGain).connect(osc.frequency);
-  const filter = a.createBiquadFilter();
-  filter.type = "bandpass";
-  filter.Q.value = 6;
-  filter.frequency.setValueAtTime(500, t);
-  filter.frequency.linearRampToValueAtTime(1400, t + dur * 0.6);
-  filter.frequency.linearRampToValueAtTime(700, t + dur);
-  const gain = a.createGain();
-  gain.gain.setValueAtTime(0.0001, t);
-  gain.gain.linearRampToValueAtTime(0.16, t + 0.12);
-  gain.gain.linearRampToValueAtTime(0.1, t + dur * 0.7);
-  gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  osc.connect(filter).connect(gain).connect(a.destination);
-  osc.start(t);
-  lfo.start(t);
-  osc.stop(t + dur + 0.05);
-  lfo.stop(t + dur + 0.05);
-  for (let i = 0; i < 5; i++) noise(0.04, { vol: 0.05, freq: 3000, delay: Math.random() * dur });
+  const t0 = a.currentTime;
+  const phrases = [[0.0, 0.55, 520, 1250], [0.7, 0.4, 700, 1500], [1.2, 0.35, 450, 1000]];
+  for (const [start, len, f0, f1] of phrases) {
+    let t = t0 + start;
+    while (t < t0 + start + len) {
+      const p = (t - t0 - start) / len;
+      const pulse = 0.012 + Math.random() * 0.012;
+      const osc = a.createOscillator();
+      osc.type = "sawtooth";
+      const f = f0 + (f1 - f0) * p + (Math.random() - 0.5) * 120;
+      osc.frequency.setValueAtTime(f, t);
+      osc.frequency.linearRampToValueAtTime(f * 1.08, t + pulse);
+      const filter = a.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.value = 1800 + Math.random() * 600;
+      filter.Q.value = 5;
+      const g = a.createGain();
+      const vol = 0.07 * Math.sin(Math.PI * p) + 0.01;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(vol, t + pulse * 0.3);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + pulse);
+      osc.connect(filter).connect(g).connect(a.destination);
+      osc.start(t);
+      osc.stop(t + pulse + 0.01);
+      t += pulse + 0.004 + Math.random() * 0.012;
+    }
+  }
 }
 
 export const sfx = {
@@ -96,7 +94,7 @@ export const sfx = {
   crouch: () => tone(220, 0.1, { to: 140, vol: 0.1 }),
   sit: () => { tone(240, 0.12, { to: 150, vol: 0.14 }); tone(180, 0.1, { to: 120, vol: 0.1, delay: 0.08 }); },
   stand: () => tone(320, 0.12, { type: "triangle", to: 520, vol: 0.12 }),
-  door: () => { creak(); tone(70, 0.25, { to: 40, vol: 0.2, delay: 1.0 }); },
+  door: () => { creak(); tone(90, 0.2, { to: 55, vol: 0.12, delay: 1.6 }); },
   click: () => tone(660, 0.07, { type: "triangle", vol: 0.1 }),
 };
 
