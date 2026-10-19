@@ -24,6 +24,7 @@ const ROOMS = {
   home: {
     width: 2400,
     doors: [
+      { id: "dad", x: 1530, label: "Dad", to: "homeDad", arrive: "back" },
       { id: "mum", x: 1700, label: "Mum", to: "mum", arrive: "home" },
       { id: "out", x: 2000, label: "Out", to: "outside", arrive: "home" },
     ],
@@ -51,13 +52,25 @@ const ROOMS = {
   pinkMum: mumRoom("pink", "#8a4a7a", [drawShelf, 450], [drawCauldron, 850], [drawChair, 1000, "chair"], [drawMirror, 1150, null], [drawBed, 1300, "bed"]),
   blueMum: mumRoom("blue", "#3f5a8a", [drawCabinet, 450], [drawFireplace, 420], [drawCat, 560, null], [drawHangingRack, 700], [drawChair, 1050, "chair"], [drawBed, 1250, "bed"]),
   yellowMum: mumRoom("yellow", "#8a7a3a", [drawCabinet, 400], [drawFireplace, 370], [drawMirror, 780, null], [drawBroom, 950], [drawChair, 1100, "chair"], [drawBed, 1250, "bed"]),
-  pink: neighbourRoom("n1", "pinkMum", "#7a5a8a", [drawShelf, 450], [drawCauldron, 900], [drawBed, 1000, "bed"]),
-  blue: neighbourRoom("n2", "blueMum", "#3a4f7a", [drawCabinet, 450], [drawChair, 900, "chair"], [drawMirror, 1050, null], [drawCat, 1200, null]),
-  yellow: neighbourRoom("n3", "yellowMum", "#7a6a3a", [drawShelf, 450], [drawBroom, 800], [drawChair, 950, "chair"], [drawBed, 1050, "bed"]),
+  homeDad: dadRoom("home", "#3a4a6e", [drawCauldron, 450], [drawShelf, 650], [drawChair, 1000, "chair"], [drawBed, 1250, "bed"]),
+  pinkDad: dadRoom("pink", "#6e3a5a", [drawBroom, 450], [drawBed, 650, "bed"], [drawCauldron, 1100], [drawChair, 1300, "chair"]),
+  blueDad: dadRoom("blue", "#2f4a5e", [drawShelf, 400], [drawChair, 800, "chair"], [drawHangingRack, 950], [drawCauldron, 1250], [drawBroom, 1450]),
+  yellowDad: dadRoom("yellow", "#6e5e2f", [drawCabinet, 450], [drawFireplace, 420], [drawBed, 900, "bed"], [drawMirror, 1280, null], [drawChair, 1400, "chair"]),
+  pink: neighbourRoom("n1", "pinkMum", "pinkDad", "#7a5a8a", [drawShelf, 450], [drawCauldron, 900], [drawBed, 1000, "bed"]),
+  blue: neighbourRoom("n2", "blueMum", "blueDad", "#3a4f7a", [drawCabinet, 450], [drawChair, 900, "chair"], [drawMirror, 1050, null], [drawCat, 1200, null]),
+  yellow: neighbourRoom("n3", "yellowMum", "yellowDad", "#7a6a3a", [drawShelf, 450], [drawBroom, 800], [drawChair, 950, "chair"], [drawBed, 1050, "bed"]),
 };
 
 function mumRoom(parent, wall, ...items) {
-  const door = { id: "back", x: 150, label: "Back", to: parent, arrive: "mum" };
+  return backRoom(parent, "mum", wall, items);
+}
+
+function dadRoom(parent, wall, ...items) {
+  return backRoom(parent, "dad", wall, items);
+}
+
+function backRoom(parent, arrive, wall, items) {
+  const door = { id: "back", x: 150, label: "Back", to: parent, arrive };
   return {
     width: ROOMS_MUM_WIDTH,
     doors: [door],
@@ -92,20 +105,22 @@ function furnish(ctx, items) {
   }
 }
 
-function neighbourRoom(arrive, mumKey, wall, ...items) {
-  const width = 1800;
+function neighbourRoom(arrive, mumKey, dadKey, wall, ...items) {
+  const width = 2100;
   const seats = seatsFor(items);
   const door = { id: "out", x: 150, label: "Out", to: "outside", arrive };
   const mumDoor = { id: "mum", x: 1500, label: "Mum", to: mumKey, arrive: "back" };
+  const dadDoor = { id: "dad", x: 1800, label: "Dad", to: dadKey, arrive: "back" };
   return {
     width,
-    doors: [door, mumDoor],
+    doors: [door, mumDoor, dadDoor],
     seats,
     draw(ctx) {
       paintRoom(ctx, width, wall);
       furnish(ctx, items);
       drawDoor(ctx, door.x, door.label);
       drawDoor(ctx, mumDoor.x, mumDoor.label);
+      drawDoor(ctx, dadDoor.x, dadDoor.label);
     },
   };
 }
