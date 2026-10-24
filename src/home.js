@@ -15,6 +15,7 @@ const SIT_SQUASH = 0.8;
 const DOOR_W = 130;
 
 const ROOMS_MUM_WIDTH = 1700;
+const KITCHEN_WIDTH = 1900;
 
 const SEATS = {
   chair: { reach: 50, height: 70, dir: -1, dx: 35 },
@@ -136,11 +137,14 @@ function neighbourRoom(arrive, mumKey, dadKey, kitchenKey, wall, ...items) {
 function kitchenRoom(parent, wall, accent) {
   const door = { id: "back", x: 150, label: "Back", to: parent, arrive: "kitchen" };
   return {
-    width: ROOMS_MUM_WIDTH,
+    width: KITCHEN_WIDTH,
     doors: [door],
-    seats: [],
+    seats: [
+      { name: "stool", x: 1520, reach: 40, height: 45, dir: 1 },
+      { name: "stool", x: 1740, reach: 40, height: 45, dir: -1 },
+    ],
     draw(ctx) {
-      drawKitchen(ctx, ROOMS_MUM_WIDTH, wall, accent);
+      drawKitchen(ctx, KITCHEN_WIDTH, wall, accent);
       drawDoor(ctx, door.x, door.label);
     },
   };
@@ -309,12 +313,21 @@ function drawKitchen(ctx, w, wall, accent) {
 
   // table with stools
   ctx.fillStyle = "#8a5a2b";
-  ctx.fillRect(1500, 385, 160, 12);
-  ctx.fillRect(1510, 397, 10, 43);
-  ctx.fillRect(1640, 397, 10, 43);
+  ctx.fillRect(1550, 385, 160, 12);
+  ctx.fillRect(1560, 397, 10, 43);
+  ctx.fillRect(1690, 397, 10, 43);
+  for (const x of [1520, 1740]) {
+    ctx.fillStyle = accent;
+    ctx.beginPath();
+    ctx.roundRect(x - 24, 395, 48, 12, 6);
+    ctx.fill();
+    ctx.fillStyle = "#5b3f24";
+    ctx.fillRect(x - 17, 407, 7, 33);
+    ctx.fillRect(x + 10, 407, 7, 33);
+  }
   ctx.fillStyle = "#fff";
   ctx.beginPath();
-  ctx.ellipse(1580, 380, 24, 6, 0, 0, Math.PI * 2);
+  ctx.ellipse(1630, 380, 24, 6, 0, 0, Math.PI * 2);
   ctx.fill();
 }
 
