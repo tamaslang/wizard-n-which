@@ -606,7 +606,7 @@ function drawDoorHint(ctx, player) {
   ctx.fillStyle = "#ffd166";
   ctx.font = "bold 30px system-ui, sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("↑", player.x, FLOOR_Y - 150 + Math.sin(performance.now() / 200) * 4);
+  ctx.fillText("↑", player.x, groundY(player.room, player.x) - 150 + Math.sin(performance.now() / 200) * 4);
 }
 
 function drawWeb(ctx, x, y) {
@@ -685,12 +685,16 @@ function drawDoor(ctx, x, label) {
   ctx.fillText(label, x + 65, FLOOR_Y - 120);
 }
 
+function groundY(room, x) {
+  return room === "outside" ? pathY(x) : FLOOR_Y;
+}
+
 function drawKid(ctx, player) {
   const sitting = Boolean(player.seat);
   const bob = sitting ? player.y : player.crouch ? 0 : player.y > 0 ? player.y : Math.abs(Math.sin(player.walk)) * 4;
   const s = KID_SCALE;
   ctx.save();
-  ctx.translate(player.x, FLOOR_Y - bob);
+  ctx.translate(player.x, groundY(player.room, player.x) - bob);
   ctx.scale(player.dir, sitting ? SIT_SQUASH : player.crouch ? CROUCH_SQUASH : 1);
   ctx.drawImage(player.image, (-200 * s) / 2, -250 * s, 200 * s, 260 * s);
   ctx.restore();
@@ -699,7 +703,7 @@ function drawKid(ctx, player) {
     const h = HELPER_SCALE;
     const lift = player.helperKind === "bat" || player.helperKind === "owl" ? 40 + Math.sin(player.walk * 0.5 + performance.now() / 300) * 6 : 0;
     ctx.save();
-    ctx.translate(player.helperX, FLOOR_Y - lift);
+    ctx.translate(player.helperX, groundY(player.room, player.helperX) - lift);
     ctx.scale(player.dir, 1);
     ctx.drawImage(player.helperImage, (-200 * h) / 2, -190 * h, 200 * h, 200 * h);
     ctx.restore();
