@@ -345,19 +345,25 @@ function drawHill(ctx, w) {
 }
 
 function drawPath(ctx, w) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, FLOOR_Y, w, VIEW_H - FLOOR_Y);
+  ctx.clip();
   const widthAt = (x) => 46 * Math.max(0, 1 - Math.max(0, (x - HILL_START) / (w - HILL_START)) ** 0.8);
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
   const spurs = [ROOMS.outside.doors[0], ...ROOMS.outside.doors.slice(1)].map((d) => d.x + DOOR_W / 2);
   ctx.strokeStyle = "#c9a56b";
   ctx.lineWidth = 40;
+  ctx.lineCap = "butt";
   for (const cx of spurs) {
     const y = pathY(cx);
     ctx.beginPath();
-    ctx.moveTo(cx, PATH_TOP);
+    ctx.moveTo(cx, FLOOR_Y);
     ctx.bezierCurveTo(cx + 30, PATH_TOP + 20, cx - 30, y - 20, cx, y);
     ctx.stroke();
   }
+  ctx.lineCap = "round";
   for (let x = 0; x < w; x += 6) {
     ctx.lineWidth = widthAt(x);
     if (ctx.lineWidth < 0.5) break;
@@ -366,7 +372,7 @@ function drawPath(ctx, w) {
     ctx.lineTo(x + 7, pathY(x + 7));
     ctx.stroke();
   }
-  ctx.lineCap = "butt";
+  ctx.restore();
 }
 
 const NEIGHBOURS = [
