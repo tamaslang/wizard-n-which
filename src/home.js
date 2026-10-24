@@ -60,7 +60,7 @@ const ROOMS = {
   pinkDad: dadRoom("pink", "#6e3a5a", [drawBroom, 450], [drawBed, 650, "bed", "#c0392b"], [drawCauldron, 1100], [drawChair, 1300, "chair"]),
   blueDad: dadRoom("blue", "#2f4a5e", [drawShelf, 400], [drawChair, 800, "chair"], [drawHangingRack, 950], [drawCauldron, 1250], [drawBroom, 1450]),
   yellowDad: dadRoom("yellow", "#6e5e2f", [drawCabinet, 450], [drawFireplace, 420], [drawBed, 900, "bed", "#1f5a3a"], [drawMirror, 1280, null], [drawChair, 1400, "chair"]),
-  myRoom: backRoom("home", "mine", "#4a5a9a", [[drawShelf, 450], [drawBed, 800, "bed", "#8e44ad"], [drawMirror, 1100, null], [drawChair, 1400, "chair"]]),
+  myRoom: backRoom("home", "mine", "#4a5a9a", [[drawDresser, 300], [drawShelf, 450], [drawBed, 800, "bed", "#8e44ad"], [drawMirror, 1100, null], [drawChair, 1400, "chair"]]),
   homeKitchen: kitchenRoom("home", "#e8d9b5", "#5b8fb9"),
   pinkKitchen: kitchenRoom("pink", "#f0d3e0", "#c0608f"),
   blueKitchen: kitchenRoom("blue", "#d3e3f0", "#3f6fb0"),
@@ -631,6 +631,7 @@ function drawMumRoom(ctx, w = ROOMS.mum.width, wall = "#5b3a6e", doorX = ROOMS.m
   ctx.fillRect(0, FLOOR_Y, w, VIEW_H - FLOOR_Y);
 
   drawWeb(ctx, 40, 0);
+  drawDresser(ctx, 300);
   drawCabinet(ctx, 650);
   drawHangingRack(ctx, 900);
   drawFireplace(ctx, 620);
@@ -785,6 +786,30 @@ function drawBed(ctx, x, cover = "#6b4fbf") {
   ctx.beginPath();
   ctx.roundRect(x + 24, FLOOR_Y - 118, 75, 30, 12);
   ctx.fill();
+}
+
+function drawDresser(ctx, x) {
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(x, 340, 190, 100);
+  ctx.fillStyle = "#8a5a2b";
+  ctx.fillRect(x + 6, 346, 178, 88);
+  ctx.fillStyle = "#0004";
+  ctx.fillRect(x + 6, 376, 178, 3);
+  ctx.fillRect(x + 6, 406, 178, 3);
+  ctx.fillStyle = "#ffd166";
+  for (const y of [360, 392, 422]) {
+    ctx.beginPath();
+    ctx.arc(x + 70, y - 2, 5, 0, Math.PI * 2);
+    ctx.arc(x + 120, y - 2, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = "#c9b8ee";
+  ctx.fillRect(x + 20, 318, 34, 22);
+  ctx.fillStyle = "#ff5fa2";
+  ctx.beginPath();
+  ctx.arc(x + 130, 328, 12, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillRect(x + 126, 306, 8, 10);
 }
 
 function drawMirror(ctx, x, y) {
