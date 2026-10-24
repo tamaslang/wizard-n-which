@@ -15,6 +15,7 @@ const SIT_SQUASH = 0.8;
 const DOOR_W = 130;
 
 const ROOMS_MUM_WIDTH = 1700;
+const KITCHEN_WIDTH = 1900;
 
 const SEATS = {
   chair: { reach: 50, height: 70, dir: -1, dx: 35 },
@@ -25,6 +26,8 @@ const ROOMS = {
   home: {
     width: 2400,
     doors: [
+      { id: "kitchen", x: 300, label: "Kitchen", to: "homeKitchen", arrive: "back" },
+      { id: "mine", x: 1200, label: "My room", to: "myRoom", arrive: "back" },
       { id: "dad", x: 1530, label: "Dad", to: "homeDad", arrive: "back" },
       { id: "mum", x: 1700, label: "Mum", to: "mum", arrive: "home" },
       { id: "out", x: 2000, label: "Out", to: "outside", arrive: "home" },
@@ -41,7 +44,7 @@ const ROOMS = {
     draw: drawMumRoom,
   },
   outside: {
-    width: 2400,
+    width: 3400,
     doors: [
       { id: "home", x: 300, label: "Home", to: "home", arrive: "out" },
       { id: "n1", x: 1015, to: "pink", arrive: "out" },
@@ -50,16 +53,21 @@ const ROOMS = {
     ],
     draw: drawOutside,
   },
-  pinkMum: mumRoom("pink", "#8a4a7a", [drawShelf, 450], [drawCauldron, 850], [drawChair, 1000, "chair"], [drawMirror, 1150, null], [drawBed, 1300, "bed"]),
-  blueMum: mumRoom("blue", "#3f5a8a", [drawCabinet, 450], [drawFireplace, 420], [drawCat, 560, null], [drawHangingRack, 700], [drawChair, 1050, "chair"], [drawBed, 1250, "bed"]),
-  yellowMum: mumRoom("yellow", "#8a7a3a", [drawCabinet, 400], [drawFireplace, 370], [drawMirror, 780, null], [drawBroom, 950], [drawChair, 1100, "chair"], [drawBed, 1250, "bed"]),
+  pinkMum: mumRoom("pink", "#8a4a7a", [drawDresser, 300], [drawShelf, 450], [drawCauldron, 850], [drawChair, 1000, "chair"], [drawMirror, 1150, null], [drawBed, 1300, "bed"]),
+  blueMum: mumRoom("blue", "#3f5a8a", [drawDresser, 300], [drawCabinet, 450], [drawFireplace, 520], [drawCat, 620, null], [drawHangingRack, 700], [drawChair, 1050, "chair"], [drawBed, 1250, "bed"]),
+  yellowMum: mumRoom("yellow", "#8a7a3a", [drawDresser, 300], [drawCabinet, 400], [drawFireplace, 520], [drawMirror, 780, null], [drawBroom, 1040], [drawChair, 1100, "chair"], [drawBed, 1250, "bed"]),
   homeDad: dadRoom("home", "#3a4a6e", [drawCauldron, 450], [drawShelf, 650], [drawChair, 1000, "chair"], [drawBed, 1250, "bed", "#2f6fd0"]),
   pinkDad: dadRoom("pink", "#6e3a5a", [drawBroom, 450], [drawBed, 650, "bed", "#c0392b"], [drawCauldron, 1100], [drawChair, 1300, "chair"]),
   blueDad: dadRoom("blue", "#2f4a5e", [drawShelf, 400], [drawChair, 800, "chair"], [drawHangingRack, 950], [drawCauldron, 1250], [drawBroom, 1450]),
   yellowDad: dadRoom("yellow", "#6e5e2f", [drawCabinet, 450], [drawFireplace, 420], [drawBed, 900, "bed", "#1f5a3a"], [drawMirror, 1280, null], [drawChair, 1400, "chair"]),
-  pink: neighbourRoom("n1", "pinkMum", "pinkDad", "#7a5a8a", [drawShelf, 450], [drawCauldron, 900], [drawBed, 1000, "bed"]),
-  blue: neighbourRoom("n2", "blueMum", "blueDad", "#3a4f7a", [drawCabinet, 450], [drawChair, 900, "chair"], [drawMirror, 1050, null], [drawCat, 1200, null]),
-  yellow: neighbourRoom("n3", "yellowMum", "yellowDad", "#7a6a3a", [drawShelf, 450], [drawBroom, 800], [drawChair, 950, "chair"], [drawBed, 1050, "bed"]),
+  myRoom: backRoom("home", "mine", "#4a5a9a", [[drawDresser, 300], [drawShelf, 450], [drawBed, 800, "bed", "#8e44ad"], [drawMirror, 1100, null], [drawChair, 1400, "chair"]]),
+  homeKitchen: kitchenRoom("home", "#e8d9b5", "#5b8fb9"),
+  pinkKitchen: kitchenRoom("pink", "#f0d3e0", "#c0608f"),
+  blueKitchen: kitchenRoom("blue", "#d3e3f0", "#3f6fb0"),
+  yellowKitchen: kitchenRoom("yellow", "#f3e8b0", "#c08a2f"),
+  pink: neighbourRoom("n1", "pinkMum", "pinkDad", "pinkKitchen", "#7a5a8a", [drawShelf, 450], [drawCauldron, 900], [drawBed, 1000, "bed"]),
+  blue: neighbourRoom("n2", "blueMum", "blueDad", "blueKitchen", "#3a4f7a", [drawCabinet, 450], [drawChair, 900, "chair"], [drawMirror, 1050, null], [drawCat, 1200, null]),
+  yellow: neighbourRoom("n3", "yellowMum", "yellowDad", "yellowKitchen", "#7a6a3a", [drawShelf, 450], [drawBroom, 800], [drawChair, 950, "chair"], [drawBed, 1050, "bed"]),
 };
 
 function mumRoom(parent, wall, ...items) {
@@ -106,15 +114,16 @@ function furnish(ctx, items) {
   }
 }
 
-function neighbourRoom(arrive, mumKey, dadKey, wall, ...items) {
+function neighbourRoom(arrive, mumKey, dadKey, kitchenKey, wall, ...items) {
   const width = 2100;
   const seats = seatsFor(items);
   const door = { id: "out", x: 150, label: "Out", to: "outside", arrive };
   const mumDoor = { id: "mum", x: 1500, label: "Mum", to: mumKey, arrive: "back" };
   const dadDoor = { id: "dad", x: 1800, label: "Dad", to: dadKey, arrive: "back" };
+  const kitchenDoor = { id: "kitchen", x: 300, label: "Kitchen", to: kitchenKey, arrive: "back" };
   return {
     width,
-    doors: [door, mumDoor, dadDoor],
+    doors: [door, kitchenDoor, mumDoor, dadDoor],
     seats,
     draw(ctx) {
       paintRoom(ctx, width, wall);
@@ -122,8 +131,206 @@ function neighbourRoom(arrive, mumKey, dadKey, wall, ...items) {
       drawDoor(ctx, door.x, door.label);
       drawDoor(ctx, mumDoor.x, mumDoor.label);
       drawDoor(ctx, dadDoor.x, dadDoor.label);
+      drawDoor(ctx, kitchenDoor.x, kitchenDoor.label);
     },
   };
+}
+
+function kitchenRoom(parent, wall, accent) {
+  const door = { id: "back", x: 150, label: "Back", to: parent, arrive: "kitchen" };
+  return {
+    width: KITCHEN_WIDTH,
+    doors: [door],
+    seats: [
+      { name: "stool", x: 1520, reach: 40, height: 45, dir: 1 },
+      { name: "stool", x: 1740, reach: 40, height: 45, dir: -1 },
+    ],
+    draw(ctx) {
+      drawKitchen(ctx, KITCHEN_WIDTH, wall, accent);
+      drawDoor(ctx, door.x, door.label);
+    },
+  };
+}
+
+function drawKitchen(ctx, w, wall, accent) {
+  ctx.fillStyle = wall;
+  ctx.fillRect(0, 0, w, FLOOR_Y);
+  ctx.fillStyle = "#fffa";
+  ctx.fillRect(0, 250, w, FLOOR_Y - 250);
+  ctx.fillStyle = "#0002";
+  for (let x = 0; x < w; x += 50) ctx.fillRect(x, 250, 2, FLOOR_Y - 250);
+  for (let y = 250; y < FLOOR_Y; y += 50) ctx.fillRect(0, y, w, 2);
+  for (let x = 0; x < w; x += 60) {
+    for (let r = 0; r < 2; r++) {
+      ctx.fillStyle = (x / 60 + r) % 2 ? "#e9e3d6" : "#9a8f7c";
+      ctx.fillRect(x, FLOOR_Y + r * 50, 60, 50);
+    }
+  }
+
+  // window with night sky and curtains
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(520, 70, 200, 170);
+  ctx.fillStyle = "#26205a";
+  ctx.fillRect(530, 80, 180, 150);
+  ctx.fillStyle = "#ffe9a8";
+  ctx.beginPath();
+  ctx.arc(650, 130, 20, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(617, 80, 6, 150);
+  ctx.fillRect(530, 152, 180, 6);
+  ctx.fillStyle = accent;
+  ctx.fillRect(505, 62, 45, 190);
+  ctx.fillRect(690, 62, 45, 190);
+
+  // upper cabinets
+  ctx.fillStyle = accent;
+  for (const x of [250, 760]) {
+    ctx.fillRect(x, 70, 230, 150);
+    ctx.fillStyle = "#0003";
+    ctx.fillRect(x + 113, 70, 4, 150);
+    ctx.fillStyle = "#ffd166";
+    ctx.fillRect(x + 95, 170, 8, 24);
+    ctx.fillRect(x + 127, 170, 8, 24);
+    ctx.fillStyle = accent;
+  }
+
+  // lower cabinets and worktop
+  ctx.fillStyle = accent;
+  ctx.fillRect(250, 340, 740, 100);
+  ctx.fillStyle = "#0003";
+  for (const x of [250, 430, 620, 800]) ctx.fillRect(x, 340, 4, 100);
+  ctx.fillStyle = "#ffd166";
+  for (const x of [380, 560, 750, 930]) ctx.fillRect(x - 8, 365, 8, 28);
+  ctx.fillStyle = "#cfc6b8";
+  ctx.fillRect(235, 325, 770, 18);
+
+  // sink and tap
+  ctx.fillStyle = "#9fb2bf";
+  ctx.beginPath();
+  ctx.roundRect(440, 322, 160, 12, [0, 0, 14, 14]);
+  ctx.fill();
+  ctx.fillStyle = "#aab";
+  ctx.fillRect(515, 270, 10, 52);
+  ctx.fillRect(515, 270, 40, 8);
+  ctx.fillRect(547, 270, 8, 20);
+
+  // kettle, jars and fruit bowl on the worktop
+  ctx.fillStyle = "#d9d9e6";
+  ctx.beginPath();
+  ctx.roundRect(840, 285, 55, 40, 10);
+  ctx.fill();
+  ctx.fillRect(895, 295, 18, 6);
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(850, 276, 35, 6);
+  ctx.fillStyle = "#c9b8ee";
+  ctx.fillRect(275, 290, 30, 35);
+  ctx.fillRect(315, 280, 30, 45);
+  ctx.fillStyle = "#e94b3c";
+  ctx.beginPath();
+  ctx.arc(700, 315, 11, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#f2c94c";
+  ctx.beginPath();
+  ctx.arc(722, 316, 10, 0, Math.PI * 2);
+  ctx.fill();
+
+  // stove, oven and extractor hood
+  ctx.fillStyle = "#2b2b33";
+  ctx.fillRect(1060, 340, 200, 100);
+  ctx.fillStyle = "#444452";
+  ctx.fillRect(1070, 372, 180, 60);
+  ctx.fillStyle = "#6a6a78";
+  ctx.fillRect(1080, 382, 160, 40);
+  ctx.fillStyle = "#ffd166";
+  ctx.fillRect(1100, 354, 10, 10);
+  ctx.fillRect(1160, 354, 10, 10);
+  ctx.fillRect(1210, 354, 10, 10);
+  ctx.fillStyle = "#1c1c22";
+  ctx.fillRect(1050, 328, 220, 14);
+  ctx.fillStyle = "#1c1c22";
+  ctx.beginPath();
+  ctx.ellipse(1105, 326, 26, 6, 0, 0, Math.PI * 2);
+  ctx.ellipse(1215, 326, 26, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#b0b0bc";
+  ctx.beginPath();
+  ctx.moveTo(1060, 110);
+  ctx.lineTo(1250, 110);
+  ctx.lineTo(1280, 200);
+  ctx.lineTo(1030, 200);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillRect(1130, 60, 50, 50);
+
+  // pot with steam
+  ctx.fillStyle = "#555";
+  ctx.beginPath();
+  ctx.roundRect(1075, 282, 60, 44, [0, 0, 8, 8]);
+  ctx.fill();
+  ctx.fillStyle = "#333";
+  ctx.fillRect(1066, 290, 10, 6);
+  ctx.fillRect(1134, 290, 10, 6);
+  ctx.strokeStyle = "#fffb";
+  ctx.lineWidth = 3;
+  const t = performance.now() / 500;
+  for (const dx of [1090, 1105, 1120]) {
+    ctx.beginPath();
+    ctx.moveTo(dx, 275);
+    ctx.bezierCurveTo(dx + 8 * Math.sin(t + dx), 260, dx - 8 * Math.sin(t + dx), 245, dx + 4, 230);
+    ctx.stroke();
+  }
+
+  // hanging utensils
+  ctx.strokeStyle = "#3b2a1a";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(1300, 90);
+  ctx.lineTo(1560, 90);
+  ctx.stroke();
+  ctx.fillStyle = "#777";
+  for (const x of [1330, 1390, 1450]) {
+    ctx.fillRect(x, 92, 4, 40);
+    ctx.beginPath();
+    ctx.arc(x + 2, 150, 20, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillRect(1510, 92, 4, 60);
+  ctx.fillRect(1500, 150, 24, 8);
+
+  // fridge
+  ctx.fillStyle = "#f4f6fa";
+  ctx.beginPath();
+  ctx.roundRect(1300, 190, 150, 250, 8);
+  ctx.fill();
+  ctx.fillStyle = "#0003";
+  ctx.fillRect(1300, 290, 150, 4);
+  ctx.fillStyle = "#9aa";
+  ctx.fillRect(1420, 220, 8, 50);
+  ctx.fillRect(1420, 310, 8, 80);
+  ctx.fillStyle = "#e94b3c";
+  ctx.fillRect(1330, 210, 22, 22);
+  ctx.fillStyle = "#4bb36b";
+  ctx.fillRect(1360, 214, 22, 22);
+
+  // table with stools
+  ctx.fillStyle = "#8a5a2b";
+  ctx.fillRect(1550, 385, 160, 12);
+  ctx.fillRect(1560, 397, 10, 43);
+  ctx.fillRect(1690, 397, 10, 43);
+  for (const x of [1520, 1740]) {
+    ctx.fillStyle = accent;
+    ctx.beginPath();
+    ctx.roundRect(x - 24, 395, 48, 12, 6);
+    ctx.fill();
+    ctx.fillStyle = "#5b3f24";
+    ctx.fillRect(x - 17, 407, 7, 33);
+    ctx.fillRect(x + 10, 407, 7, 33);
+  }
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.ellipse(1630, 380, 24, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 const nearSeat = (player) =>
@@ -164,7 +371,14 @@ async function loadSvg(svg) {
 
 export async function startHome(canvas, character) {
   cancelAnimationFrame(frame);
-  const ctx = canvas.getContext("2d");
+  let ctx = canvas.getContext("2d");
+  if (!ctx) {
+    // Some embedded webviews refuse a 2d context on the original element; a clone gets one.
+    const fresh = canvas.cloneNode();
+    canvas.replaceWith(fresh);
+    canvas = fresh;
+    ctx = canvas.getContext("2d");
+  }
   const player = {
     room: "home", seat: null, x: 200, dir: 1, walk: 0, helperX: 130, y: 0, vy: 0, crouch: false,
     image: await loadSvg(characterSvg(character)),
@@ -305,10 +519,67 @@ function drawOutside(ctx) {
   for (let x = 100; x < w; x += 230) ctx.fillRect(x, 40 + ((x * 7) % 120), 4, 4);
   for (const n of NEIGHBOURS) drawHouse(ctx, n.x, n);
   for (const x of [760, 1420, 2020]) drawTree(ctx, x);
+  drawHill(ctx, w);
   ctx.fillStyle = "#2f6b4a";
   ctx.fillRect(0, FLOOR_Y, w, VIEW_H - FLOOR_Y);
+  drawPath(ctx, w);
   drawHouse(ctx, ROOMS.outside.doors[0].x + DOOR_W / 2);
   drawDoor(ctx, ROOMS.outside.doors[0].x, "Home");
+}
+
+const HILL_START = 2500;
+const PATH_TOP = FLOOR_Y + 4;
+
+function hillTop(x) {
+  const t = Math.min(1, Math.max(0, (x - HILL_START) / (ROOMS.outside.width - HILL_START)));
+  return FLOOR_Y - 190 * Math.sin((t * Math.PI) / 2) ** 1.5;
+}
+
+function pathY(x) {
+  const t = Math.max(0, (x - HILL_START) / (ROOMS.outside.width - HILL_START));
+  const wind = 26 * Math.sin(x / 110) + 8 * Math.sin(x / 40 + 1);
+  return 500 + wind * (1 - t) - t * (500 - PATH_TOP - 6);
+}
+
+function drawHill(ctx, w) {
+  ctx.fillStyle = "#245a3c";
+  ctx.beginPath();
+  ctx.moveTo(HILL_START - 300, FLOOR_Y);
+  for (let x = HILL_START - 300; x <= w; x += 20) ctx.lineTo(x, x < HILL_START ? FLOOR_Y : hillTop(x));
+  ctx.lineTo(w, FLOOR_Y);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawPath(ctx, w) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, FLOOR_Y, w, VIEW_H - FLOOR_Y);
+  ctx.clip();
+  const widthAt = (x) => 46 * Math.max(0, 1 - Math.max(0, (x - HILL_START) / (w - HILL_START)) ** 0.8);
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  const spurs = [ROOMS.outside.doors[0], ...ROOMS.outside.doors.slice(1)].map((d) => d.x + DOOR_W / 2);
+  ctx.strokeStyle = "#c9a56b";
+  ctx.lineWidth = 40;
+  ctx.lineCap = "butt";
+  for (const cx of spurs) {
+    const y = pathY(cx);
+    ctx.beginPath();
+    ctx.moveTo(cx, FLOOR_Y);
+    ctx.bezierCurveTo(cx + 30, PATH_TOP + 20, cx - 30, y - 20, cx, y);
+    ctx.stroke();
+  }
+  ctx.lineCap = "round";
+  for (let x = 0; x < w; x += 6) {
+    ctx.lineWidth = widthAt(x);
+    if (ctx.lineWidth < 0.5) break;
+    ctx.beginPath();
+    ctx.moveTo(x, pathY(x));
+    ctx.lineTo(x + 7, pathY(x + 7));
+    ctx.stroke();
+  }
+  ctx.restore();
 }
 
 const NEIGHBOURS = [
@@ -360,6 +631,7 @@ function drawMumRoom(ctx, w = ROOMS.mum.width, wall = "#5b3a6e", doorX = ROOMS.m
   ctx.fillRect(0, FLOOR_Y, w, VIEW_H - FLOOR_Y);
 
   drawWeb(ctx, 40, 0);
+  drawDresser(ctx, 300);
   drawCabinet(ctx, 650);
   drawHangingRack(ctx, 900);
   drawFireplace(ctx, 620);
@@ -516,6 +788,30 @@ function drawBed(ctx, x, cover = "#6b4fbf") {
   ctx.fill();
 }
 
+function drawDresser(ctx, x) {
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(x, 340, 190, 100);
+  ctx.fillStyle = "#8a5a2b";
+  ctx.fillRect(x + 6, 346, 178, 88);
+  ctx.fillStyle = "#0004";
+  ctx.fillRect(x + 6, 376, 178, 3);
+  ctx.fillRect(x + 6, 406, 178, 3);
+  ctx.fillStyle = "#ffd166";
+  for (const y of [360, 392, 422]) {
+    ctx.beginPath();
+    ctx.arc(x + 70, y - 2, 5, 0, Math.PI * 2);
+    ctx.arc(x + 120, y - 2, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = "#c9b8ee";
+  ctx.fillRect(x + 20, 318, 34, 22);
+  ctx.fillStyle = "#ff5fa2";
+  ctx.beginPath();
+  ctx.arc(x + 130, 328, 12, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillRect(x + 126, 306, 8, 10);
+}
+
 function drawMirror(ctx, x, y) {
   ctx.fillStyle = "#c9a227";
   ctx.beginPath();
@@ -542,7 +838,7 @@ function drawDoorHint(ctx, player) {
   ctx.fillStyle = "#ffd166";
   ctx.font = "bold 30px system-ui, sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("↑", player.x, FLOOR_Y - 150 + Math.sin(performance.now() / 200) * 4);
+  ctx.fillText("↑", player.x, groundY(player.room, player.x) - 150 + Math.sin(performance.now() / 200) * 4);
 }
 
 function drawWeb(ctx, x, y) {
@@ -621,12 +917,16 @@ function drawDoor(ctx, x, label) {
   ctx.fillText(label, x + 65, FLOOR_Y - 120);
 }
 
+function groundY(room, x) {
+  return room === "outside" ? pathY(x) : FLOOR_Y;
+}
+
 function drawKid(ctx, player) {
   const sitting = Boolean(player.seat);
   const bob = sitting ? player.y : player.crouch ? 0 : player.y > 0 ? player.y : Math.abs(Math.sin(player.walk)) * 4;
   const s = KID_SCALE;
   ctx.save();
-  ctx.translate(player.x, FLOOR_Y - bob);
+  ctx.translate(player.x, groundY(player.room, player.x) - bob);
   ctx.scale(player.dir, sitting ? SIT_SQUASH : player.crouch ? CROUCH_SQUASH : 1);
   ctx.drawImage(player.image, (-200 * s) / 2, -250 * s, 200 * s, 260 * s);
   ctx.restore();
@@ -635,7 +935,7 @@ function drawKid(ctx, player) {
     const h = HELPER_SCALE;
     const lift = player.helperKind === "bat" || player.helperKind === "owl" ? 40 + Math.sin(player.walk * 0.5 + performance.now() / 300) * 6 : 0;
     ctx.save();
-    ctx.translate(player.helperX, FLOOR_Y - lift);
+    ctx.translate(player.helperX, groundY(player.room, player.helperX) - lift);
     ctx.scale(player.dir, 1);
     ctx.drawImage(player.helperImage, (-200 * h) / 2, -190 * h, 200 * h, 200 * h);
     ctx.restore();
