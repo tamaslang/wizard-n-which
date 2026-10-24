@@ -27,6 +27,7 @@ const ROOMS = {
     width: 2400,
     doors: [
       { id: "kitchen", x: 300, label: "Kitchen", to: "homeKitchen", arrive: "back" },
+      { id: "mine", x: 1200, label: "My room", to: "myRoom", arrive: "back" },
       { id: "dad", x: 1530, label: "Dad", to: "homeDad", arrive: "back" },
       { id: "mum", x: 1700, label: "Mum", to: "mum", arrive: "home" },
       { id: "out", x: 2000, label: "Out", to: "outside", arrive: "home" },
@@ -59,6 +60,7 @@ const ROOMS = {
   pinkDad: dadRoom("pink", "#6e3a5a", [drawBroom, 450], [drawBed, 650, "bed", "#c0392b"], [drawCauldron, 1100], [drawChair, 1300, "chair"]),
   blueDad: dadRoom("blue", "#2f4a5e", [drawShelf, 400], [drawChair, 800, "chair"], [drawHangingRack, 950], [drawCauldron, 1250], [drawBroom, 1450]),
   yellowDad: dadRoom("yellow", "#6e5e2f", [drawCabinet, 450], [drawFireplace, 420], [drawBed, 900, "bed", "#1f5a3a"], [drawMirror, 1280, null], [drawChair, 1400, "chair"]),
+  myRoom: backRoom("home", "mine", "#4a5a9a", [[drawShelf, 450], [drawBed, 800, "bed", "#8e44ad"], [drawMirror, 1100, null], [drawCat, 1280, null], [drawChair, 1400, "chair"]]),
   homeKitchen: kitchenRoom("home", "#e8d9b5", "#5b8fb9"),
   pinkKitchen: kitchenRoom("pink", "#f0d3e0", "#c0608f"),
   blueKitchen: kitchenRoom("blue", "#d3e3f0", "#3f6fb0"),
