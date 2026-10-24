@@ -41,7 +41,7 @@ const ROOMS = {
     draw: drawMumRoom,
   },
   outside: {
-    width: 2400,
+    width: 3400,
     doors: [
       { id: "home", x: 300, label: "Home", to: "home", arrive: "out" },
       { id: "n1", x: 1015, to: "pink", arrive: "out" },
@@ -305,10 +305,61 @@ function drawOutside(ctx) {
   for (let x = 100; x < w; x += 230) ctx.fillRect(x, 40 + ((x * 7) % 120), 4, 4);
   for (const n of NEIGHBOURS) drawHouse(ctx, n.x, n);
   for (const x of [760, 1420, 2020]) drawTree(ctx, x);
+  drawHill(ctx, w);
   ctx.fillStyle = "#2f6b4a";
   ctx.fillRect(0, FLOOR_Y, w, VIEW_H - FLOOR_Y);
+  drawPath(ctx, w);
   drawHouse(ctx, ROOMS.outside.doors[0].x + DOOR_W / 2);
   drawDoor(ctx, ROOMS.outside.doors[0].x, "Home");
+}
+
+const HILL_START = 2500;
+const PATH_TOP = FLOOR_Y + 4;
+
+function hillTop(x) {
+  const t = Math.min(1, Math.max(0, (x - HILL_START) / (ROOMS.outside.width - HILL_START)));
+  return FLOOR_Y - 190 * Math.sin((t * Math.PI) / 2) ** 1.5;
+}
+
+function pathY(x) {
+  const t = Math.max(0, (x - HILL_START) / (ROOMS.outside.width - HILL_START));
+  const wind = 26 * Math.sin(x / 110) + 8 * Math.sin(x / 40 + 1);
+  return 500 + wind * (1 - t) - t * (500 - PATH_TOP - 6);
+}
+
+function drawHill(ctx, w) {
+  ctx.fillStyle = "#245a3c";
+  ctx.beginPath();
+  ctx.moveTo(HILL_START - 300, FLOOR_Y);
+  for (let x = HILL_START - 300; x <= w; x += 20) ctx.lineTo(x, x < HILL_START ? FLOOR_Y : hillTop(x));
+  ctx.lineTo(w, FLOOR_Y);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawPath(ctx, w) {
+  const widthAt = (x) => 46 * Math.max(0, 1 - Math.max(0, (x - HILL_START) / (w - HILL_START)) ** 0.8);
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  const spurs = [ROOMS.outside.doors[0], ...ROOMS.outside.doors.slice(1)].map((d) => d.x + DOOR_W / 2);
+  ctx.strokeStyle = "#c9a56b";
+  ctx.lineWidth = 40;
+  for (const cx of spurs) {
+    const y = pathY(cx);
+    ctx.beginPath();
+    ctx.moveTo(cx, PATH_TOP);
+    ctx.bezierCurveTo(cx + 30, PATH_TOP + 20, cx - 30, y - 20, cx, y);
+    ctx.stroke();
+  }
+  for (let x = 0; x < w; x += 6) {
+    ctx.lineWidth = widthAt(x);
+    if (ctx.lineWidth < 0.5) break;
+    ctx.beginPath();
+    ctx.moveTo(x, pathY(x));
+    ctx.lineTo(x + 7, pathY(x + 7));
+    ctx.stroke();
+  }
+  ctx.lineCap = "butt";
 }
 
 const NEIGHBOURS = [
