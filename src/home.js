@@ -25,6 +25,7 @@ const ROOMS = {
   home: {
     width: 2400,
     doors: [
+      { id: "kitchen", x: 300, label: "Kitchen", to: "homeKitchen", arrive: "back" },
       { id: "dad", x: 1530, label: "Dad", to: "homeDad", arrive: "back" },
       { id: "mum", x: 1700, label: "Mum", to: "mum", arrive: "home" },
       { id: "out", x: 2000, label: "Out", to: "outside", arrive: "home" },
@@ -57,9 +58,13 @@ const ROOMS = {
   pinkDad: dadRoom("pink", "#6e3a5a", [drawBroom, 450], [drawBed, 650, "bed", "#c0392b"], [drawCauldron, 1100], [drawChair, 1300, "chair"]),
   blueDad: dadRoom("blue", "#2f4a5e", [drawShelf, 400], [drawChair, 800, "chair"], [drawHangingRack, 950], [drawCauldron, 1250], [drawBroom, 1450]),
   yellowDad: dadRoom("yellow", "#6e5e2f", [drawCabinet, 450], [drawFireplace, 420], [drawBed, 900, "bed", "#1f5a3a"], [drawMirror, 1280, null], [drawChair, 1400, "chair"]),
-  pink: neighbourRoom("n1", "pinkMum", "pinkDad", "#7a5a8a", [drawShelf, 450], [drawCauldron, 900], [drawBed, 1000, "bed"]),
-  blue: neighbourRoom("n2", "blueMum", "blueDad", "#3a4f7a", [drawCabinet, 450], [drawChair, 900, "chair"], [drawMirror, 1050, null], [drawCat, 1200, null]),
-  yellow: neighbourRoom("n3", "yellowMum", "yellowDad", "#7a6a3a", [drawShelf, 450], [drawBroom, 800], [drawChair, 950, "chair"], [drawBed, 1050, "bed"]),
+  homeKitchen: kitchenRoom("home", "#e8d9b5", "#5b8fb9"),
+  pinkKitchen: kitchenRoom("pink", "#f0d3e0", "#c0608f"),
+  blueKitchen: kitchenRoom("blue", "#d3e3f0", "#3f6fb0"),
+  yellowKitchen: kitchenRoom("yellow", "#f3e8b0", "#c08a2f"),
+  pink: neighbourRoom("n1", "pinkMum", "pinkDad", "pinkKitchen", "#7a5a8a", [drawShelf, 450], [drawCauldron, 900], [drawBed, 1000, "bed"]),
+  blue: neighbourRoom("n2", "blueMum", "blueDad", "blueKitchen", "#3a4f7a", [drawCabinet, 450], [drawChair, 900, "chair"], [drawMirror, 1050, null], [drawCat, 1200, null]),
+  yellow: neighbourRoom("n3", "yellowMum", "yellowDad", "yellowKitchen", "#7a6a3a", [drawShelf, 450], [drawBroom, 800], [drawChair, 950, "chair"], [drawBed, 1050, "bed"]),
 };
 
 function mumRoom(parent, wall, ...items) {
@@ -106,15 +111,16 @@ function furnish(ctx, items) {
   }
 }
 
-function neighbourRoom(arrive, mumKey, dadKey, wall, ...items) {
+function neighbourRoom(arrive, mumKey, dadKey, kitchenKey, wall, ...items) {
   const width = 2100;
   const seats = seatsFor(items);
   const door = { id: "out", x: 150, label: "Out", to: "outside", arrive };
   const mumDoor = { id: "mum", x: 1500, label: "Mum", to: mumKey, arrive: "back" };
   const dadDoor = { id: "dad", x: 1800, label: "Dad", to: dadKey, arrive: "back" };
+  const kitchenDoor = { id: "kitchen", x: 300, label: "Kitchen", to: kitchenKey, arrive: "back" };
   return {
     width,
-    doors: [door, mumDoor, dadDoor],
+    doors: [door, kitchenDoor, mumDoor, dadDoor],
     seats,
     draw(ctx) {
       paintRoom(ctx, width, wall);
@@ -122,8 +128,194 @@ function neighbourRoom(arrive, mumKey, dadKey, wall, ...items) {
       drawDoor(ctx, door.x, door.label);
       drawDoor(ctx, mumDoor.x, mumDoor.label);
       drawDoor(ctx, dadDoor.x, dadDoor.label);
+      drawDoor(ctx, kitchenDoor.x, kitchenDoor.label);
     },
   };
+}
+
+function kitchenRoom(parent, wall, accent) {
+  const door = { id: "back", x: 150, label: "Back", to: parent, arrive: "kitchen" };
+  return {
+    width: ROOMS_MUM_WIDTH,
+    doors: [door],
+    seats: [],
+    draw(ctx) {
+      drawKitchen(ctx, ROOMS_MUM_WIDTH, wall, accent);
+      drawDoor(ctx, door.x, door.label);
+    },
+  };
+}
+
+function drawKitchen(ctx, w, wall, accent) {
+  ctx.fillStyle = wall;
+  ctx.fillRect(0, 0, w, FLOOR_Y);
+  ctx.fillStyle = "#fffa";
+  ctx.fillRect(0, 250, w, FLOOR_Y - 250);
+  ctx.fillStyle = "#0002";
+  for (let x = 0; x < w; x += 50) ctx.fillRect(x, 250, 2, FLOOR_Y - 250);
+  for (let y = 250; y < FLOOR_Y; y += 50) ctx.fillRect(0, y, w, 2);
+  for (let x = 0; x < w; x += 60) {
+    for (let r = 0; r < 2; r++) {
+      ctx.fillStyle = (x / 60 + r) % 2 ? "#e9e3d6" : "#9a8f7c";
+      ctx.fillRect(x, FLOOR_Y + r * 50, 60, 50);
+    }
+  }
+
+  // window with night sky and curtains
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(520, 70, 200, 170);
+  ctx.fillStyle = "#26205a";
+  ctx.fillRect(530, 80, 180, 150);
+  ctx.fillStyle = "#ffe9a8";
+  ctx.beginPath();
+  ctx.arc(650, 130, 20, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(617, 80, 6, 150);
+  ctx.fillRect(530, 152, 180, 6);
+  ctx.fillStyle = accent;
+  ctx.fillRect(505, 62, 45, 190);
+  ctx.fillRect(690, 62, 45, 190);
+
+  // upper cabinets
+  ctx.fillStyle = accent;
+  for (const x of [250, 760]) {
+    ctx.fillRect(x, 70, 230, 150);
+    ctx.fillStyle = "#0003";
+    ctx.fillRect(x + 113, 70, 4, 150);
+    ctx.fillStyle = "#ffd166";
+    ctx.fillRect(x + 95, 170, 8, 24);
+    ctx.fillRect(x + 127, 170, 8, 24);
+    ctx.fillStyle = accent;
+  }
+
+  // lower cabinets and worktop
+  ctx.fillStyle = accent;
+  ctx.fillRect(250, 340, 740, 100);
+  ctx.fillStyle = "#0003";
+  for (const x of [250, 430, 620, 800]) ctx.fillRect(x, 340, 4, 100);
+  ctx.fillStyle = "#ffd166";
+  for (const x of [380, 560, 750, 930]) ctx.fillRect(x - 8, 365, 8, 28);
+  ctx.fillStyle = "#cfc6b8";
+  ctx.fillRect(235, 325, 770, 18);
+
+  // sink and tap
+  ctx.fillStyle = "#9fb2bf";
+  ctx.beginPath();
+  ctx.roundRect(440, 322, 160, 12, [0, 0, 14, 14]);
+  ctx.fill();
+  ctx.fillStyle = "#aab";
+  ctx.fillRect(515, 270, 10, 52);
+  ctx.fillRect(515, 270, 40, 8);
+  ctx.fillRect(547, 270, 8, 20);
+
+  // kettle, jars and fruit bowl on the worktop
+  ctx.fillStyle = "#d9d9e6";
+  ctx.beginPath();
+  ctx.roundRect(840, 285, 55, 40, 10);
+  ctx.fill();
+  ctx.fillRect(895, 295, 18, 6);
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(850, 276, 35, 6);
+  ctx.fillStyle = "#c9b8ee";
+  ctx.fillRect(275, 290, 30, 35);
+  ctx.fillRect(315, 280, 30, 45);
+  ctx.fillStyle = "#e94b3c";
+  ctx.beginPath();
+  ctx.arc(700, 315, 11, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#f2c94c";
+  ctx.beginPath();
+  ctx.arc(722, 316, 10, 0, Math.PI * 2);
+  ctx.fill();
+
+  // stove, oven and extractor hood
+  ctx.fillStyle = "#2b2b33";
+  ctx.fillRect(1060, 340, 200, 100);
+  ctx.fillStyle = "#444452";
+  ctx.fillRect(1070, 372, 180, 60);
+  ctx.fillStyle = "#6a6a78";
+  ctx.fillRect(1080, 382, 160, 40);
+  ctx.fillStyle = "#ffd166";
+  ctx.fillRect(1100, 354, 10, 10);
+  ctx.fillRect(1160, 354, 10, 10);
+  ctx.fillRect(1210, 354, 10, 10);
+  ctx.fillStyle = "#1c1c22";
+  ctx.fillRect(1050, 328, 220, 14);
+  ctx.fillStyle = "#1c1c22";
+  ctx.beginPath();
+  ctx.ellipse(1105, 326, 26, 6, 0, 0, Math.PI * 2);
+  ctx.ellipse(1215, 326, 26, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#b0b0bc";
+  ctx.beginPath();
+  ctx.moveTo(1060, 110);
+  ctx.lineTo(1250, 110);
+  ctx.lineTo(1280, 200);
+  ctx.lineTo(1030, 200);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillRect(1130, 60, 50, 50);
+
+  // pot with steam
+  ctx.fillStyle = "#555";
+  ctx.beginPath();
+  ctx.roundRect(1075, 282, 60, 44, [0, 0, 8, 8]);
+  ctx.fill();
+  ctx.fillStyle = "#333";
+  ctx.fillRect(1066, 290, 10, 6);
+  ctx.fillRect(1134, 290, 10, 6);
+  ctx.strokeStyle = "#fffb";
+  ctx.lineWidth = 3;
+  const t = performance.now() / 500;
+  for (const dx of [1090, 1105, 1120]) {
+    ctx.beginPath();
+    ctx.moveTo(dx, 275);
+    ctx.bezierCurveTo(dx + 8 * Math.sin(t + dx), 260, dx - 8 * Math.sin(t + dx), 245, dx + 4, 230);
+    ctx.stroke();
+  }
+
+  // hanging utensils
+  ctx.strokeStyle = "#3b2a1a";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(1300, 90);
+  ctx.lineTo(1560, 90);
+  ctx.stroke();
+  ctx.fillStyle = "#777";
+  for (const x of [1330, 1390, 1450]) {
+    ctx.fillRect(x, 92, 4, 40);
+    ctx.beginPath();
+    ctx.arc(x + 2, 150, 20, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillRect(1510, 92, 4, 60);
+  ctx.fillRect(1500, 150, 24, 8);
+
+  // fridge
+  ctx.fillStyle = "#f4f6fa";
+  ctx.beginPath();
+  ctx.roundRect(1300, 190, 150, 250, 8);
+  ctx.fill();
+  ctx.fillStyle = "#0003";
+  ctx.fillRect(1300, 290, 150, 4);
+  ctx.fillStyle = "#9aa";
+  ctx.fillRect(1420, 220, 8, 50);
+  ctx.fillRect(1420, 310, 8, 80);
+  ctx.fillStyle = "#e94b3c";
+  ctx.fillRect(1330, 210, 22, 22);
+  ctx.fillStyle = "#4bb36b";
+  ctx.fillRect(1360, 214, 22, 22);
+
+  // table with stools
+  ctx.fillStyle = "#8a5a2b";
+  ctx.fillRect(1500, 385, 160, 12);
+  ctx.fillRect(1510, 397, 10, 43);
+  ctx.fillRect(1640, 397, 10, 43);
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.ellipse(1580, 380, 24, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 const nearSeat = (player) =>
