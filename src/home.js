@@ -164,7 +164,14 @@ async function loadSvg(svg) {
 
 export async function startHome(canvas, character) {
   cancelAnimationFrame(frame);
-  const ctx = canvas.getContext("2d");
+  let ctx = canvas.getContext("2d");
+  if (!ctx) {
+    // Some embedded webviews refuse a 2d context on the original element; a clone gets one.
+    const fresh = canvas.cloneNode();
+    canvas.replaceWith(fresh);
+    canvas = fresh;
+    ctx = canvas.getContext("2d");
+  }
   const player = {
     room: "home", seat: null, x: 200, dir: 1, walk: 0, helperX: 130, y: 0, vy: 0, crouch: false,
     image: await loadSvg(characterSvg(character)),
