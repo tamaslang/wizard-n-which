@@ -68,7 +68,7 @@ const ROOMS = {
   blueDad: dadRoom("blue", "#2f4a5e", [drawWardrobe, WARDROBE_X.dad], [drawShelf, 500], [drawChair, 800, "chair"], [drawHangingRack, 950], [drawCauldron, 1250], [drawBroom, 1450], [drawDad, DAD_X.blueDad, null, "#2f7a8a"]),
   yellowDad: dadRoom("yellow", "#6e5e2f", [drawWardrobe, WARDROBE_X.dad], [drawCabinet, 490], [drawFireplace, 490], [drawBed, 1000, "bed", "#1f5a3a"], [drawMirror, 1380, null], [drawChair, 1480, "chair"], [drawDad, DAD_X.yellowDad, null, "#1f7a4a"]),
   shop: backRoom("outside", "shop", "#2a1a3a", [[drawShelf, 400], [drawHangingCandles, 700], [drawShopLady, 1000], [drawShopCounter, 1000], [drawPumpkin, 1400], [drawShelf, 1450], [drawSpider, 1360], [drawCeilingBats, 450], [drawCeilingBats, 1150]]),
-  myRoom: backRoom("home", "mine", "#4a5a9a", [[drawDresser, 300], [drawShelf, 450], [drawBed, 800, "bed", "#8e44ad"], [drawMirror, 1100, null], [drawChair, 1400, "chair"]]),
+  myRoom: backRoom("home", "mine", "#4a5a9a", [[drawWardrobe, WARDROBE_X.mum], [drawDresser, 480], [drawShelf, 700], [drawBed, 1000, "bed", "#8e44ad"], [drawMirror, 1350, null], [drawChair, 1500, "chair"]]),
   homeKitchen: kitchenRoom("home", "#e8d9b5", "#5b8fb9"),
   pinkKitchen: kitchenRoom("pink", "#f0d3e0", "#c0608f"),
   blueKitchen: kitchenRoom("blue", "#d3e3f0", "#3f6fb0"),
@@ -385,6 +385,7 @@ function takePotion(player, potion) {
 const openWardrobes = new Set();
 const ROBE_COLOURS = ["#7a3fa0", "#2f6fd0", "#c0392b", "#2f7a8a"];
 const litRobe = new Map();
+const cupboardPotions = [];
 const WARDROBE_W = 150;
 const nearWardrobe = (player) =>
   ROOMS[player.room].wardrobe && player.x >= WARDROBE_X.mum && player.x <= WARDROBE_X.mum + WARDROBE_W;
@@ -441,7 +442,7 @@ export async function startHome(canvas, character) {
     helperKind: character.helper,
     helperImage: character.helper === "none" ? null : await loadSvg(helperSvg(character.helper)),
   };
-  window.__game = { player, shopDoor: () => ROOMS.outside.doors.find((d) => d.id === "shop"), takenPotions, dadFace: (room) => ({ x: DAD_X[room], y: MUM_FACE_Y + 1 }), mumFace: (room) => ({ x: MUM_X[room], y: MUM_FACE_Y - 9 }), shopLadyFace: () => ({ x: 1250, y: 278 }), openWardrobes, litRobe, robeColours: ROBE_COLOURS, wardrobeKnob: (room) => ({ x: WARDROBE_X[room] + 75, y: 270 }) };
+  window.__game = { player, shopDoor: () => ROOMS.outside.doors.find((d) => d.id === "shop"), takenPotions, dadFace: (room) => ({ x: DAD_X[room], y: MUM_FACE_Y + 1 }), mumFace: (room) => ({ x: MUM_X[room], y: MUM_FACE_Y - 9 }), shopLadyFace: () => ({ x: 1250, y: 278 }), openWardrobes, litRobe, cupboardPotions, robeColours: ROBE_COLOURS, wardrobeKnob: (room) => ({ x: WARDROBE_X[room] + 75, y: 270 }) };
   let last = performance.now();
 
   const tick = (now) => {
@@ -486,7 +487,7 @@ function update(player, dt) {
   }
   const down = keys.has("ArrowDown") || keys.has("KeyS");
   const wasCrouching = player.crouch;
-  player.crouch = down && player.y === 0 && !(nearWardrobe(player) && openWardrobes.has(player.room)) && !nearCounter(player);
+  player.crouch = down && player.y === 0 && !(nearWardrobe(player) && openWardrobes.has(player.room)) && !nearCounter(player) && !(player.room === "myRoom" && nearWardrobe(player));
   if (player.crouch && !wasCrouching) sfx.crouch();
   const speed = player.crouch ? SPEED * CROUCH_SPEED : SPEED;
   if (move) {
@@ -507,6 +508,11 @@ function update(player, dt) {
     sfx.take();
   }
   if (grounded && downPressed && nearCounter(player)) payAtCounter(player);
+  if (grounded && downPressed && player.room === "myRoom" && nearWardrobe(player) && !litRobe.has(player.room) && player.bag.length) {
+    cupboardPotions.push(...player.bag);
+    player.bag = [];
+    sfx.take();
+  }
   if (wardrobeOpen && grounded && downPressed && litRobe.has(player.room)) {
     player.dress = ROBE_COLOURS[litRobe.get(player.room)];
     sfx.take();
@@ -1098,6 +1104,17 @@ function drawWardrobe(ctx, x) {
     ctx.fillRect(x + 6, top + 6, w - 12, bottom - top - 12);
     ctx.fillStyle = "#6b4423";
     ctx.fillRect(x + 6, top + 40, w - 12, 5);
+    if (drawingRoom === "myRoom") {
+      cupboardPotions.forEach((c, i) => {
+        const bx = x + 20 + (i % 8) * 15;
+        const by = bottom - 20 - Math.floor(i / 8) * 20;
+        ctx.fillStyle = c;
+        ctx.beginPath();
+        ctx.arc(bx, by, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillRect(bx - 2, by - 12, 4, 7);
+      });
+    }
     ROBE_COLOURS.forEach((c, i) => {
       const rx = x + 22 + i * 32;
       if (litRobe.get(drawingRoom) === i) {
