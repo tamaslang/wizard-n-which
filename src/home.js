@@ -14,6 +14,11 @@ const CROUCH_SQUASH = 0.65;
 const SIT_SQUASH = 0.8;
 const DOOR_W = 130;
 
+const WARDROBE_X = { mum: 300, dad: 300 };
+const SHOP_X = 2750;
+const MUM_X = { mum: 1135, pinkMum: 1245, blueMum: 975, yellowMum: 880 };
+const DAD_X = { homeDad: 1170, pinkDad: 1230, blueDad: 1060, yellowDad: 750 };
+const MUM_FACE_Y = 335;
 const ROOMS_MUM_WIDTH = 1700;
 const KITCHEN_WIDTH = 1900;
 
@@ -36,6 +41,7 @@ const ROOMS = {
   },
   mum: {
     width: 1700,
+    wardrobe: true,
     doors: [{ id: "home", x: 150, label: "Back", to: "home", arrive: "mum" }],
     seats: [
       { name: "chair", x: 1045, reach: 50, height: 70, dir: -1 },
@@ -44,22 +50,24 @@ const ROOMS = {
     draw: drawMumRoom,
   },
   outside: {
-    width: 3400,
+    width: 4100,
     doors: [
       { id: "home", x: 300, label: "Home", to: "home", arrive: "out" },
       { id: "n1", x: 1015, to: "pink", arrive: "out" },
       { id: "n2", x: 1685, to: "blue", arrive: "out" },
       { id: "n3", x: 2185, to: "yellow", arrive: "out" },
+      { id: "shop", x: SHOP_X - DOOR_W / 2, to: "shop", arrive: "back" },
     ],
     draw: drawOutside,
   },
-  pinkMum: mumRoom("pink", "#8a4a7a", [drawDresser, 300], [drawShelf, 450], [drawCauldron, 850], [drawChair, 1000, "chair"], [drawMirror, 1150, null], [drawBed, 1300, "bed"]),
-  blueMum: mumRoom("blue", "#3f5a8a", [drawDresser, 300], [drawCabinet, 450], [drawFireplace, 520], [drawCat, 620, null], [drawHangingRack, 700], [drawChair, 1050, "chair"], [drawBed, 1250, "bed"]),
-  yellowMum: mumRoom("yellow", "#8a7a3a", [drawDresser, 300], [drawCabinet, 400], [drawFireplace, 520], [drawMirror, 780, null], [drawBroom, 1040], [drawChair, 1100, "chair"], [drawBed, 1250, "bed"]),
-  homeDad: dadRoom("home", "#3a4a6e", [drawCauldron, 450], [drawShelf, 650], [drawChair, 1000, "chair"], [drawBed, 1250, "bed", "#2f6fd0"]),
-  pinkDad: dadRoom("pink", "#6e3a5a", [drawBroom, 450], [drawBed, 650, "bed", "#c0392b"], [drawCauldron, 1100], [drawChair, 1300, "chair"]),
-  blueDad: dadRoom("blue", "#2f4a5e", [drawShelf, 400], [drawChair, 800, "chair"], [drawHangingRack, 950], [drawCauldron, 1250], [drawBroom, 1450]),
-  yellowDad: dadRoom("yellow", "#6e5e2f", [drawCabinet, 450], [drawFireplace, 420], [drawBed, 900, "bed", "#1f5a3a"], [drawMirror, 1280, null], [drawChair, 1400, "chair"]),
+  pinkMum: mumRoom("pink", "#8a4a7a", [drawWardrobe, WARDROBE_X.mum], [drawDresser, 480], [drawShelf, 700], [drawCauldron, 880], [drawChair, 1000, "chair"], [drawMirror, 1150, null], [drawBed, 1300, "bed"], [drawMum, MUM_X.pinkMum, null, "#c0608f"]),
+  blueMum: mumRoom("blue", "#3f5a8a", [drawWardrobe, WARDROBE_X.mum], [drawDresser, 480], [drawCabinet, 740], [drawFireplace, 710], [drawCat, 850, null], [drawHangingRack, 990], [drawChair, 1050, "chair"], [drawBed, 1250, "bed"], [drawMum, MUM_X.blueMum, null, "#3f6fb0"]),
+  yellowMum: mumRoom("yellow", "#8a7a3a", [drawWardrobe, WARDROBE_X.mum], [drawDresser, 480], [drawCabinet, 480], [drawFireplace, 760], [drawMirror, 1020, null], [drawBroom, 1270], [drawChair, 1310, "chair"], [drawBed, 1400, "bed"], [drawMum, MUM_X.yellowMum, null, "#c08a2f"]),
+  homeDad: dadRoom("home", "#3a4a6e", [drawWardrobe, WARDROBE_X.dad], [drawCauldron, 600], [drawShelf, 760], [drawChair, 1000, "chair"], [drawBed, 1250, "bed", "#2f6fd0"], [drawDad, DAD_X.homeDad, null, "#2f6fd0"]),
+  pinkDad: dadRoom("pink", "#6e3a5a", [drawWardrobe, WARDROBE_X.dad], [drawBroom, 500], [drawBed, 650, "bed", "#c0392b"], [drawCauldron, 1100], [drawChair, 1300, "chair"], [drawDad, DAD_X.pinkDad, null, "#c0392b"]),
+  blueDad: dadRoom("blue", "#2f4a5e", [drawWardrobe, WARDROBE_X.dad], [drawShelf, 500], [drawChair, 800, "chair"], [drawHangingRack, 950], [drawCauldron, 1250], [drawBroom, 1450], [drawDad, DAD_X.blueDad, null, "#2f7a8a"]),
+  yellowDad: dadRoom("yellow", "#6e5e2f", [drawWardrobe, WARDROBE_X.dad], [drawCabinet, 490], [drawFireplace, 490], [drawBed, 1000, "bed", "#1f5a3a"], [drawMirror, 1380, null], [drawChair, 1480, "chair"], [drawDad, DAD_X.yellowDad, null, "#1f7a4a"]),
+  shop: backRoom("outside", "shop", "#2a1a3a", [[drawShelf, 400], [drawHangingCandles, 700], [drawShopLady, 1000], [drawShopCounter, 1000], [drawPumpkin, 1400], [drawShelf, 1450], [drawSpider, 1360], [drawCeilingBats, 450], [drawCeilingBats, 1150]]),
   myRoom: backRoom("home", "mine", "#4a5a9a", [[drawDresser, 300], [drawShelf, 450], [drawBed, 800, "bed", "#8e44ad"], [drawMirror, 1100, null], [drawChair, 1400, "chair"]]),
   homeKitchen: kitchenRoom("home", "#e8d9b5", "#5b8fb9"),
   pinkKitchen: kitchenRoom("pink", "#f0d3e0", "#c0608f"),
@@ -84,6 +92,8 @@ function backRoom(parent, arrive, wall, items) {
     width: ROOMS_MUM_WIDTH,
     doors: [door],
     seats: seatsFor(items),
+    shelves: shelvesFor(items),
+    wardrobe: items.some(([fn]) => fn === drawWardrobe),
     draw(ctx) {
       paintRoom(ctx, ROOMS_MUM_WIDTH, wall);
       furnish(ctx, items);
@@ -96,6 +106,10 @@ function seatsFor(items) {
   return items
     .filter(([, , kind]) => kind in SEATS)
     .map(([, x, kind]) => ({ name: kind, x: x + SEATS[kind].dx, reach: SEATS[kind].reach, height: SEATS[kind].height, dir: SEATS[kind].dir }));
+}
+
+function shelvesFor(items) {
+  return items.filter(([fn]) => fn === drawShelf).map(([, x]) => x);
 }
 
 function paintRoom(ctx, width, wall) {
@@ -125,6 +139,7 @@ function neighbourRoom(arrive, mumKey, dadKey, kitchenKey, wall, ...items) {
     width,
     doors: [door, kitchenDoor, mumDoor, dadDoor],
     seats,
+    shelves: shelvesFor(items),
     draw(ctx) {
       paintRoom(ctx, width, wall);
       furnish(ctx, items);
@@ -141,6 +156,7 @@ function kitchenRoom(parent, wall, accent) {
   return {
     width: KITCHEN_WIDTH,
     doors: [door],
+    shelves: [500],
     seats: [
       { name: "stool", x: 1520, reach: 40, height: 45, dir: 1 },
       { name: "stool", x: 1740, reach: 40, height: 45, dir: -1 },
@@ -333,6 +349,46 @@ function drawKitchen(ctx, w, wall, accent) {
   ctx.fill();
 }
 
+const POTION_COLOURS = ["#ff5fa2", "#5fd0ff", "#7dff8a", "#ffd166"];
+const SHELF_W = 260;
+const takenPotions = new Set();
+let drawingRoom = "";
+
+const potionSpots = (sx) =>
+  Array.from({ length: 8 }, (_, i) => ({ i, x: sx + 40 + (i % 4) * 60, y: i < 4 ? 200 : 300 }));
+
+function nearPotion(player) {
+  let best = null;
+  for (const sx of ROOMS[player.room].shelves ?? []) {
+    if (player.x < sx || player.x > sx + SHELF_W) continue;
+    for (const spot of potionSpots(sx)) {
+      if (takenPotions.has(`${player.room}:${sx}:${spot.i}`)) continue;
+      const dist = Math.abs(player.x - spot.x);
+      if (!best || dist < best.dist) best = { key: `${player.room}:${sx}:${spot.i}`, colour: POTION_COLOURS[spot.i % 4], dist };
+    }
+  }
+  return best;
+}
+
+const POTION_PRICE = 2;
+const COUNTER_X = 1000;
+const COUNTER_W = 320;
+const nearCounter = (player) => player.room === "shop" && player.x >= COUNTER_X && player.x <= COUNTER_X + COUNTER_W;
+
+function takePotion(player, potion) {
+  takenPotions.add(potion.key);
+  if (player.room === "shop") player.basket.push(potion);
+  else player.bag.push(potion.colour);
+  sfx.take();
+}
+
+const openWardrobes = new Set();
+const ROBE_COLOURS = ["#7a3fa0", "#2f6fd0", "#c0392b", "#2f7a8a"];
+const litRobe = new Map();
+const WARDROBE_W = 150;
+const nearWardrobe = (player) =>
+  ROOMS[player.room].wardrobe && player.x >= WARDROBE_X.mum && player.x <= WARDROBE_X.mum + WARDROBE_W;
+
 const nearSeat = (player) =>
   (ROOMS[player.room].seats ?? []).find((seat) => Math.abs(player.x - seat.x) < seat.reach);
 
@@ -380,11 +436,12 @@ export async function startHome(canvas, character) {
     ctx = canvas.getContext("2d");
   }
   const player = {
-    room: "home", seat: null, x: 200, dir: 1, walk: 0, helperX: 130, y: 0, vy: 0, crouch: false,
+    room: "home", seat: null, bag: [], basket: [], money: 20, x: 200, dir: 1, walk: 0, helperX: 130, y: 0, vy: 0, crouch: false,
     image: await loadSvg(characterSvg(character)),
     helperKind: character.helper,
     helperImage: character.helper === "none" ? null : await loadSvg(helperSvg(character.helper)),
   };
+  window.__game = { player, shopDoor: () => ROOMS.outside.doors.find((d) => d.id === "shop"), takenPotions, dadFace: (room) => ({ x: DAD_X[room], y: MUM_FACE_Y + 1 }), mumFace: (room) => ({ x: MUM_X[room], y: MUM_FACE_Y - 9 }), shopLadyFace: () => ({ x: 1250, y: 278 }), openWardrobes, litRobe, robeColours: ROBE_COLOURS, wardrobeKnob: (room) => ({ x: WARDROBE_X[room] + 75, y: 270 }) };
   let last = performance.now();
 
   const tick = (now) => {
@@ -401,12 +458,17 @@ export function stopHome() {
   cancelAnimationFrame(frame);
 }
 
+const UP_KEYS_ANY = ["ArrowUp", "KeyW", "Space"];
+
 function update(player, dt) {
   const left = keys.has("ArrowLeft") || keys.has("KeyA");
   const right = keys.has("ArrowRight") || keys.has("KeyD");
-  const move = (right ? 1 : 0) - (left ? 1 : 0);
+  const atOpenWardrobe = nearWardrobe(player) && openWardrobes.has(player.room);
+  const comboHeld = atOpenWardrobe && left && UP_KEYS_ANY.some((k) => keys.has(k));
+  const move = comboHeld ? 0 : (right ? 1 : 0) - (left ? 1 : 0);
   const UP_KEYS = ["ArrowUp", "KeyW", "Space"];
   const upPressed = UP_KEYS.some((k) => tapped.has(k));
+  const leftPressed = ["ArrowLeft", "KeyA"].some((k) => tapped.has(k));
   const downPressed = ["ArrowDown", "KeyS"].some((k) => tapped.has(k));
   tapped.clear();
 
@@ -424,7 +486,7 @@ function update(player, dt) {
   }
   const down = keys.has("ArrowDown") || keys.has("KeyS");
   const wasCrouching = player.crouch;
-  player.crouch = down && player.y === 0;
+  player.crouch = down && player.y === 0 && !(nearWardrobe(player) && openWardrobes.has(player.room)) && !nearCounter(player);
   if (player.crouch && !wasCrouching) sfx.crouch();
   const speed = player.crouch ? SPEED * CROUCH_SPEED : SPEED;
   if (move) {
@@ -439,10 +501,27 @@ function update(player, dt) {
   player.stepPhase = move ? phase : 0;
   const grounded = player.y === 0;
   const up = UP_KEYS.some((k) => keys.has(k));
+  const wardrobeOpen = nearWardrobe(player) && openWardrobes.has(player.room);
+  if (wardrobeOpen && grounded && left && up && (upPressed || leftPressed)) {
+    litRobe.set(player.room, ((litRobe.get(player.room) ?? -1) + 1) % ROBE_COLOURS.length);
+    sfx.take();
+  }
+  if (grounded && downPressed && nearCounter(player)) payAtCounter(player);
+  if (wardrobeOpen && grounded && downPressed && litRobe.has(player.room)) {
+    player.dress = ROBE_COLOURS[litRobe.get(player.room)];
+    sfx.take();
+  }
   const door = nearDoor(player);
   if (grounded && !player.crouch && door && upPressed) enterDoor(player, door);
   else if (grounded && !player.crouch && !door && upPressed && nearSeat(player)) sitDown(player, nearSeat(player));
-  else if (grounded && !player.crouch && !door && !nearSeat(player) && up) {
+  else if (grounded && !player.crouch && !door && !nearSeat(player) && upPressed && !left && nearWardrobe(player)) {
+    const had = openWardrobes.delete(player.room);
+    if (!had) openWardrobes.add(player.room);
+    litRobe.delete(player.room);
+    sfx.take();
+  }
+  else if (grounded && !player.crouch && !door && !nearSeat(player) && upPressed && nearPotion(player)) takePotion(player, nearPotion(player));
+  else if (grounded && !player.crouch && !door && !nearSeat(player) && !nearWardrobe(player) && !nearPotion(player) && up) {
     player.vy = JUMP_SPEED;
     sfx.jump();
   }
@@ -468,7 +547,19 @@ function sitDown(player, seat) {
   player.crouch = false;
 }
 
+function payAtCounter(player) {
+  const cost = player.basket.length * POTION_PRICE;
+  if (!cost) return;
+  if (cost > player.money) { sfx.stand(); return; }
+  player.money -= cost;
+  player.bag.push(...player.basket.map((p) => p.colour));
+  player.basket = [];
+  sfx.take();
+}
+
 function enterDoor(player, door) {
+  for (const p of player.basket) takenPotions.delete(p.key);
+  player.basket = [];
   sfx.door();
   const target = ROOMS[door.to];
   const arrival = target.doors.find((d) => d.id === door.arrive);
@@ -480,14 +571,46 @@ function enterDoor(player, door) {
 
 function draw(ctx, player) {
   const room = ROOMS[player.room];
+  drawingRoom = player.room;
   const camX = Math.min(room.width - VIEW_W, Math.max(0, player.x - VIEW_W / 2));
   ctx.clearRect(0, 0, VIEW_W, VIEW_H);
   ctx.save();
   ctx.translate(-camX, 0);
   room.draw(ctx);
   drawKid(ctx, player);
-  if (!player.seat && (nearDoor(player) || nearSeat(player))) drawDoorHint(ctx, player);
+  if (!player.seat && (nearDoor(player) || nearSeat(player) || nearWardrobe(player) || nearPotion(player))) drawDoorHint(ctx, player);
   ctx.restore();
+  drawBag(ctx, player);
+}
+
+function drawBag(ctx, player) {
+  player.bag.forEach((colour, i) => {
+    ctx.fillStyle = colour;
+    ctx.beginPath();
+    ctx.arc(30 + (i % 12) * 26, 30 + Math.floor(i / 12) * 26, 10, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#fff8";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+  player.basket.forEach((p, i) => {
+    const n = player.bag.length + i;
+    ctx.strokeStyle = p.colour;
+    ctx.setLineDash([4, 3]);
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(30 + (n % 12) * 26, 30 + Math.floor(n / 12) * 26, 10, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+  ctx.fillStyle = "#ffd166";
+  ctx.beginPath();
+  ctx.arc(30, 505, 10, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.font = "bold 20px sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillText(String(player.money), 48, 512);
 }
 
 function drawHome(ctx) {
@@ -518,6 +641,7 @@ function drawOutside(ctx) {
   ctx.fillStyle = "#ffd34d";
   for (let x = 100; x < w; x += 230) ctx.fillRect(x, 40 + ((x * 7) % 120), 4, 4);
   for (const n of NEIGHBOURS) drawHouse(ctx, n.x, n);
+  drawShopFront(ctx, SHOP_X);
   for (const x of [760, 1420, 2020]) drawTree(ctx, x);
   drawHill(ctx, w);
   ctx.fillStyle = "#2f6b4a";
@@ -527,7 +651,7 @@ function drawOutside(ctx) {
   drawDoor(ctx, ROOMS.outside.doors[0].x, "Home");
 }
 
-const HILL_START = 2500;
+const HILL_START = 3200;
 const PATH_TOP = FLOOR_Y + 4;
 
 function hillTop(x) {
@@ -624,6 +748,310 @@ function drawHouse(ctx, cx, o = {}) {
   }
 }
 
+function drawBat(ctx, x, y, size = 1, hanging = false) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(size, hanging ? -size : size);
+  ctx.fillStyle = "#0d0818";
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 8, 11, 0, 0, Math.PI * 2);
+  ctx.moveTo(-6, -2);
+  ctx.quadraticCurveTo(-26, -18, -40, -2);
+  ctx.quadraticCurveTo(-30, -2, -26, 8);
+  ctx.quadraticCurveTo(-18, 2, -10, 10);
+  ctx.moveTo(6, -2);
+  ctx.quadraticCurveTo(26, -18, 40, -2);
+  ctx.quadraticCurveTo(30, -2, 26, 8);
+  ctx.quadraticCurveTo(18, 2, 10, 10);
+  ctx.fill();
+  ctx.fillStyle = "#ff5a5a";
+  ctx.fillRect(-5, -4, 3, 3);
+  ctx.fillRect(2, -4, 3, 3);
+  ctx.restore();
+}
+
+function drawPumpkin(ctx, x) {
+  ctx.fillStyle = "#e8761c";
+  ctx.beginPath();
+  ctx.ellipse(x, FLOOR_Y - 28, 36, 28, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#3b6b1c";
+  ctx.fillRect(x - 4, FLOOR_Y - 62, 8, 12);
+  ctx.fillStyle = "#ffe14d";
+  ctx.beginPath();
+  ctx.moveTo(x - 20, FLOOR_Y - 40);
+  ctx.lineTo(x - 8, FLOOR_Y - 40);
+  ctx.lineTo(x - 14, FLOOR_Y - 28);
+  ctx.moveTo(x + 20, FLOOR_Y - 40);
+  ctx.lineTo(x + 8, FLOOR_Y - 40);
+  ctx.lineTo(x + 14, FLOOR_Y - 28);
+  ctx.moveTo(x - 20, FLOOR_Y - 18);
+  ctx.lineTo(x - 10, FLOOR_Y - 12);
+  ctx.lineTo(x - 4, FLOOR_Y - 18);
+  ctx.lineTo(x + 4, FLOOR_Y - 12);
+  ctx.lineTo(x + 10, FLOOR_Y - 18);
+  ctx.lineTo(x + 20, FLOOR_Y - 18);
+  ctx.lineTo(x + 12, FLOOR_Y - 8);
+  ctx.lineTo(x - 12, FLOOR_Y - 8);
+  ctx.fill();
+}
+
+function drawShopFront(ctx, cx) {
+  const half = 170;
+  const top = FLOOR_Y - 250;
+  drawHouse(ctx, cx, { half, h: 250, wall: "#3a2a4a", roof: "#1d1030", door: "#3fae4a" });
+  for (const wx of [cx - half + 10, cx + half - 100]) {
+    const wy = top + 30;
+    const glow = ctx.createRadialGradient(wx + 45, wy + 40, 5, wx + 45, wy + 40, 70);
+    glow.addColorStop(0, "#d6ff8a");
+    glow.addColorStop(1, "#3fae4a");
+    ctx.fillStyle = glow;
+    ctx.fillRect(wx, wy, 90, 80);
+    ctx.fillStyle = "#ffe14d";
+    ctx.beginPath();
+    ctx.ellipse(wx + 28, wy + 40, 9, 6, 0, 0, Math.PI * 2);
+    ctx.ellipse(wx + 62, wy + 40, 9, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#1a0f24";
+    ctx.fillRect(wx + 26, wy + 35, 4, 10);
+    ctx.fillRect(wx + 60, wy + 35, 4, 10);
+    ctx.fillStyle = "#1a0f24";
+    ctx.fillRect(wx, wy, 90, 5);
+    ctx.fillRect(wx, wy + 75, 90, 5);
+  }
+  ctx.fillStyle = "#1a0f24";
+  ctx.fillRect(cx - 70, FLOOR_Y - 180, 140, 40);
+  ctx.fillStyle = "#8dff6a";
+  ctx.font = "bold 28px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("SHOP", cx, FLOOR_Y - 150);
+  for (let i = 0; i < 6; i++) {
+    ctx.fillStyle = i % 2 ? "#4a2f6e" : "#150b22";
+    ctx.fillRect(cx - 120 + i * 40, FLOOR_Y - 125, 40, 22);
+  }
+  drawPumpkin(ctx, cx + 110);
+  drawBat(ctx, cx - 120, top - 150, 1);
+  drawBat(ctx, cx + 60, top - 170, 0.7);
+  drawBat(ctx, cx + 190, top - 110, 0.8);
+}
+
+function drawHangingCandles(ctx, x) {
+  for (const [dx, len] of [[0, 120], [60, 190], [120, 90]]) {
+    const cx = x + dx;
+    ctx.strokeStyle = "#8a7a9a";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, 0);
+    ctx.lineTo(cx, len);
+    ctx.stroke();
+    const glow = ctx.createRadialGradient(cx, len - 10, 2, cx, len - 10, 45);
+    glow.addColorStop(0, "#ffe14d88");
+    glow.addColorStop(1, "#ffe14d00");
+    ctx.fillStyle = glow;
+    ctx.fillRect(cx - 45, len - 55, 90, 90);
+    ctx.fillStyle = "#f2eaff";
+    ctx.fillRect(cx - 7, len, 14, 40);
+    ctx.fillStyle = "#ffb52e";
+    ctx.beginPath();
+    ctx.ellipse(cx, len - 8, 5, 10, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function drawCeilingBats(ctx, x) {
+  drawBat(ctx, x, 22, 0.9, true);
+  drawBat(ctx, x + 110, 18, 0.7, true);
+}
+
+function drawSpider(ctx, x) {
+  ctx.strokeStyle = "#cfc4e6";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(x, 0);
+  ctx.lineTo(x, 150);
+  ctx.stroke();
+  ctx.fillStyle = "#0d0818";
+  ctx.beginPath();
+  ctx.ellipse(x, 160, 10, 12, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#0d0818";
+  ctx.lineWidth = 2;
+  for (const d of [-1, 1]) {
+    for (const dy of [-6, 0, 6]) {
+      ctx.beginPath();
+      ctx.moveTo(x, 160 + dy / 2);
+      ctx.lineTo(x + d * 18, 155 + dy * 2);
+      ctx.stroke();
+    }
+  }
+}
+
+function drawMum(ctx, x, dress) {
+  ctx.fillStyle = "#4a2a1a";
+  ctx.beginPath();
+  ctx.ellipse(x, MUM_FACE_Y + 14, 26, 40, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = dress;
+  ctx.beginPath();
+  ctx.moveTo(x - 16, MUM_FACE_Y + 18);
+  ctx.lineTo(x + 16, MUM_FACE_Y + 18);
+  ctx.lineTo(x + 34, FLOOR_Y - 4);
+  ctx.lineTo(x - 34, FLOOR_Y - 4);
+  ctx.fill();
+  ctx.fillStyle = "#0003";
+  ctx.fillRect(x - 24, FLOOR_Y - 14, 48, 4);
+  ctx.strokeStyle = dress;
+  ctx.lineWidth = 8;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(x - 14, MUM_FACE_Y + 26);
+  ctx.lineTo(x - 28, MUM_FACE_Y + 62);
+  ctx.moveTo(x + 14, MUM_FACE_Y + 26);
+  ctx.lineTo(x + 28, MUM_FACE_Y + 62);
+  ctx.stroke();
+  ctx.fillStyle = "#e8d5b5";
+  ctx.beginPath();
+  for (const [cx, cy, r] of [[x - 28, MUM_FACE_Y + 64, 6], [x + 28, MUM_FACE_Y + 64, 6], [x, MUM_FACE_Y, 20]]) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = "#1a0f24";
+  ctx.beginPath();
+  ctx.arc(x - 7, MUM_FACE_Y + 3, 2.5, 0, Math.PI * 2);
+  ctx.arc(x + 7, MUM_FACE_Y + 3, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#a02c4a";
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.arc(x, MUM_FACE_Y + 8, 7, 0.2 * Math.PI, 0.8 * Math.PI);
+  ctx.stroke();
+  ctx.fillStyle = "#ffd166";
+  ctx.beginPath();
+  ctx.arc(x + 12, MUM_FACE_Y - 16, 4, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawDad(ctx, x, robe) {
+  const y = MUM_FACE_Y;
+  ctx.fillStyle = robe;
+  ctx.beginPath();
+  ctx.moveTo(x - 20, y + 18);
+  ctx.lineTo(x + 20, y + 18);
+  ctx.lineTo(x + 38, FLOOR_Y - 4);
+  ctx.lineTo(x - 38, FLOOR_Y - 4);
+  ctx.fill();
+  ctx.fillStyle = "#0003";
+  ctx.fillRect(x - 28, FLOOR_Y - 14, 56, 4);
+  ctx.fillStyle = "#ffd166";
+  ctx.fillRect(x - 19, y + 52, 38, 6);
+  ctx.strokeStyle = robe;
+  ctx.lineWidth = 10;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(x - 18, y + 26);
+  ctx.lineTo(x - 32, y + 64);
+  ctx.moveTo(x + 18, y + 26);
+  ctx.lineTo(x + 32, y + 64);
+  ctx.stroke();
+  ctx.fillStyle = "#e8d5b5";
+  for (const [cx, cy, r] of [[x - 32, y + 66, 6], [x + 32, y + 66, 6], [x, y, 21]]) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = "#5a3a22";
+  ctx.beginPath();
+  ctx.arc(x, y - 1, 22, Math.PI, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(x - 20, y + 6);
+  ctx.quadraticCurveTo(x, y + 30, x + 20, y + 6);
+  ctx.quadraticCurveTo(x, y + 12, x - 20, y + 6);
+  ctx.fill();
+  ctx.strokeStyle = "#1a0f24";
+  ctx.lineWidth = 2;
+  for (const dx of [-8, 8]) {
+    ctx.beginPath();
+    ctx.arc(x + dx, y + 3, 5, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.beginPath();
+  ctx.moveTo(x - 3, y + 3);
+  ctx.lineTo(x + 3, y + 3);
+  ctx.stroke();
+}
+
+function drawShopLady(ctx, x) {
+  const cx = x + 250;
+  ctx.fillStyle = "#1f1230";
+  ctx.beginPath();
+  ctx.ellipse(cx, 300, 30, 46, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#4a2a7a";
+  ctx.beginPath();
+  ctx.moveTo(cx - 28, 440);
+  ctx.lineTo(cx - 20, 312);
+  ctx.lineTo(cx + 20, 312);
+  ctx.lineTo(cx + 28, 440);
+  ctx.fill();
+  ctx.fillStyle = "#e8d5b5";
+  ctx.beginPath();
+  ctx.arc(cx, 288, 22, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#ffe14d";
+  ctx.beginPath();
+  ctx.arc(cx - 8, 290, 4, 0, Math.PI * 2);
+  ctx.arc(cx + 8, 290, 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#1a0f24";
+  ctx.fillRect(cx - 9, 287, 2, 6);
+  ctx.fillRect(cx + 7, 287, 2, 6);
+  ctx.strokeStyle = "#a02c4a";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(cx, 297, 8, 0.2 * Math.PI, 0.8 * Math.PI);
+  ctx.stroke();
+  ctx.fillStyle = "#5b2a86";
+  ctx.beginPath();
+  ctx.moveTo(cx - 40, 268);
+  ctx.lineTo(cx + 40, 268);
+  ctx.lineTo(cx + 10, 262);
+  ctx.lineTo(cx + 16, 200);
+  ctx.lineTo(cx - 12, 262);
+  ctx.fill();
+  ctx.fillStyle = "#8dff6a";
+  ctx.fillRect(cx - 22, 255, 40, 7);
+}
+
+function drawShopCounter(ctx, x) {
+  ctx.fillStyle = "#3b2a1a";
+  ctx.fillRect(x, 350, 320, 90);
+  ctx.fillStyle = "#8a5a2b";
+  ctx.fillRect(x + 8, 358, 304, 74);
+  ctx.fillStyle = "#b8895a";
+  ctx.fillRect(x - 10, 336, 340, 16);
+  ctx.fillStyle = "#ffd166";
+  ctx.fillRect(x + 20, 306, 50, 30);
+  const jar = (jx, colour) => {
+    ctx.fillStyle = colour;
+    ctx.beginPath();
+    ctx.roundRect(jx, 296, 34, 40, 8);
+    ctx.fill();
+  };
+  jar(x + 90, "#9b5fff");
+  jar(x + 140, "#5fd0ff");
+  jar(x + 190, "#7dff8a");
+  ctx.fillStyle = "#ffe14d";
+  ctx.beginPath();
+  ctx.arc(x + 152, 312, 4, 0, Math.PI * 2);
+  ctx.arc(x + 164, 312, 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#1a0f24";
+  ctx.fillRect(x + 151, 309, 2, 6);
+  ctx.fillRect(x + 163, 309, 2, 6);
+}
+
 function drawMumRoom(ctx, w = ROOMS.mum.width, wall = "#5b3a6e", doorX = ROOMS.mum.doors[0].x) {
   ctx.fillStyle = wall;
   ctx.fillRect(0, 0, w, FLOOR_Y);
@@ -631,15 +1059,71 @@ function drawMumRoom(ctx, w = ROOMS.mum.width, wall = "#5b3a6e", doorX = ROOMS.m
   ctx.fillRect(0, FLOOR_Y, w, VIEW_H - FLOOR_Y);
 
   drawWeb(ctx, 40, 0);
-  drawDresser(ctx, 300);
-  drawCabinet(ctx, 650);
-  drawHangingRack(ctx, 900);
-  drawFireplace(ctx, 620);
-  drawCat(ctx, 760, FLOOR_Y);
+  drawWardrobe(ctx, WARDROBE_X.mum);
+  drawDresser(ctx, 480);
+  drawCabinet(ctx, 740);
+  drawHangingRack(ctx, 990);
+  drawFireplace(ctx, 710);
+  drawCat(ctx, 850, FLOOR_Y);
   drawChair(ctx, 1010);
-  drawMirror(ctx, 1160, FLOOR_Y - 70);
+  drawMirror(ctx, 1235, FLOOR_Y - 70);
   drawBed(ctx, 1300);
+  drawMum(ctx, MUM_X.mum, "#7a3fa0");
   drawDoor(ctx, doorX, "Back");
+}
+
+function drawWardrobe(ctx, x) {
+  const w = 150;
+  const top = 130;
+  const bottom = FLOOR_Y - 30;
+  const mid = x + w / 2;
+  ctx.fillStyle = "#b8895a";
+  for (const fx of [x + 5, x + w - 35]) {
+    ctx.beginPath();
+    ctx.moveTo(fx, bottom);
+    ctx.lineTo(fx + 30, bottom);
+    ctx.lineTo(fx + 30, FLOOR_Y - 10);
+    ctx.quadraticCurveTo(fx + 30, FLOOR_Y, fx + 18, FLOOR_Y);
+    ctx.lineTo(fx, FLOOR_Y);
+    ctx.lineTo(fx, FLOOR_Y - 12);
+    ctx.lineTo(fx + 10, FLOOR_Y - 12);
+    ctx.lineTo(fx + 10, bottom);
+    ctx.fill();
+  }
+  ctx.fillStyle = "#4a2f18";
+  ctx.fillRect(x - 6, top - 12, w + 12, 12);
+  ctx.fillRect(x, top, w, bottom - top);
+  if (openWardrobes.has(drawingRoom)) {
+    ctx.fillStyle = "#1a1008";
+    ctx.fillRect(x + 6, top + 6, w - 12, bottom - top - 12);
+    ctx.fillStyle = "#6b4423";
+    ctx.fillRect(x + 6, top + 40, w - 12, 5);
+    ROBE_COLOURS.forEach((c, i) => {
+      const rx = x + 22 + i * 32;
+      if (litRobe.get(drawingRoom) === i) {
+        ctx.fillStyle = "rgba(255, 240, 150, 0.85)";
+        ctx.fillRect(rx - 10, top + 40, 48, 110);
+      }
+      ctx.fillStyle = c;
+      ctx.beginPath();
+      ctx.moveTo(rx, top + 45);
+      ctx.lineTo(rx + 24, top + 45);
+      ctx.lineTo(rx + 28, top + 140);
+      ctx.lineTo(rx - 4, top + 140);
+      ctx.fill();
+    });
+    ctx.fillStyle = "#8a5a2b";
+    ctx.fillRect(x - 12, top + 6, 14, bottom - top - 12);
+    ctx.fillRect(x + w - 2, top + 6, 14, bottom - top - 12);
+    return;
+  }
+  ctx.fillStyle = "#8a5a2b";
+  ctx.fillRect(x + 6, top + 6, w / 2 - 9, bottom - top - 12);
+  ctx.fillRect(mid + 3, top + 6, w / 2 - 9, bottom - top - 12);
+  ctx.fillStyle = "#2a2a2a";
+  ctx.beginPath();
+  ctx.ellipse(mid, top + (bottom - top) / 2, 12, 15, 0, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 function drawCabinet(ctx, x) {
@@ -860,19 +1344,16 @@ function drawWeb(ctx, x, y) {
 
 function drawShelf(ctx, x) {
   ctx.fillStyle = "#8a5a2b";
-  ctx.fillRect(x, 220, 260, 12);
-  ctx.fillRect(x, 320, 260, 12);
-  const potions = ["#ff5fa2", "#5fd0ff", "#7dff8a", "#ffd166"];
-  potions.forEach((c, i) => {
-    ctx.fillStyle = c;
+  ctx.fillRect(x, 220, SHELF_W, 12);
+  ctx.fillRect(x, 320, SHELF_W, 12);
+  for (const spot of potionSpots(x)) {
+    if (takenPotions.has(`${drawingRoom}:${x}:${spot.i}`)) continue;
+    ctx.fillStyle = POTION_COLOURS[spot.i % 4];
     ctx.beginPath();
-    ctx.arc(x + 40 + i * 60, 200, 18, 0, Math.PI * 2);
+    ctx.arc(spot.x, spot.y, 18, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillRect(x + 34 + i * 60, 168, 12, 16);
-    ctx.beginPath();
-    ctx.arc(x + 40 + i * 60, 300, 18, 0, Math.PI * 2);
-    ctx.fill();
-  });
+    if (spot.i < 4) ctx.fillRect(spot.x - 6, spot.y - 32, 12, 16);
+  }
 }
 
 function drawCauldron(ctx, x) {
@@ -929,6 +1410,15 @@ function drawKid(ctx, player) {
   ctx.translate(player.x, groundY(player.room, player.x) - bob);
   ctx.scale(player.dir, sitting ? SIT_SQUASH : player.crouch ? CROUCH_SQUASH : 1);
   ctx.drawImage(player.image, (-200 * s) / 2, -250 * s, 200 * s, 260 * s);
+  if (player.dress) {
+    ctx.fillStyle = player.dress;
+    ctx.beginPath();
+    ctx.moveTo(-9, -46);
+    ctx.lineTo(9, -46);
+    ctx.lineTo(24, -22);
+    ctx.lineTo(-24, -22);
+    ctx.fill();
+  }
   ctx.restore();
 
   if (player.helperImage) {
