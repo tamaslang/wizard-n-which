@@ -91,6 +91,7 @@ export const sfx = {
   sit: () => { tone(240, 0.12, { to: 150, vol: 0.14 }); tone(180, 0.1, { to: 120, vol: 0.1, delay: 0.08 }); },
   stand: () => tone(320, 0.12, { type: "triangle", to: 520, vol: 0.12 }),
   door: () => { creak(); tone(90, 0.2, { to: 55, vol: 0.12, delay: 1.75 }); },
+  take: () => { tone(520, 0.1, { type: "triangle", to: 880, vol: 0.14 }); tone(1040, 0.08, { type: "triangle", vol: 0.08, delay: 0.08 }); },
   click: () => tone(660, 0.07, { type: "triangle", vol: 0.1 }),
 };
 
