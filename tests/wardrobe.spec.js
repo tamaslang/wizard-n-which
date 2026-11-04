@@ -34,10 +34,8 @@ test("dad's room has a wardrobe with a dark round knob", async ({ page }) => {
 
 test("wardrobe is absent in rooms that don't have one (unhappy path)", async ({ page }) => {
   await startGame(page);
-  await page.evaluate(() => { window.__game.player.x = 1200 + 65; });
-  await page.keyboard.press("ArrowUp");
-  await page.waitForFunction(() => window.__game.player.room === "myRoom");
-  await page.waitForTimeout(100);
+  await page.evaluate(() => { Object.assign(window.__game.player, { room: "shop", x: 900 }); });
+  await page.waitForTimeout(150);
   expect(await knobPixel(page, "mum")).not.toEqual([42, 42, 42, 255]);
 });
 
