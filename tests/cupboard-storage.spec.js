@@ -41,3 +41,19 @@ test("pressing down at my cupboard with an empty bag does nothing (unhappy path)
   await page.waitForTimeout(150);
   expect(await counts(page)).toEqual({ bag: 0, stored: 0 });
 });
+
+test("potions taken from shelves in other houses and my own house go in the cupboard too", async ({ page }) => {
+  await startInMyRoom(page, 375);
+  await page.evaluate(() => { window.__game.player.bag = []; });
+  for (const [room, x] of [["pink", 500], ["myRoom", 750]]) {
+    await page.evaluate(([r, px]) => { Object.assign(window.__game.player, { room: r, x: px }); }, [room, x]);
+    await page.waitForTimeout(150);
+    await page.keyboard.press("ArrowUp");
+    await page.waitForTimeout(150);
+  }
+  expect((await counts(page)).bag).toBe(2);
+  await page.evaluate(() => { window.__game.player.x = 375; });
+  await page.waitForTimeout(150);
+  await page.keyboard.press("ArrowDown");
+  await expect.poll(() => counts(page)).toEqual({ bag: 0, stored: 2 });
+});
