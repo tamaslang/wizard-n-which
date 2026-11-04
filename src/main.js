@@ -1,4 +1,4 @@
-import { sfx, isMuted, setMuted } from "./sound.js";
+import { sfx, isMuted, setMuted, startMusic, stopMusic } from "./sound.js";
 import { state, showScene } from "./scenes.js";
 import { startHome } from "./home.js";
 import { startDesigner } from "./designer.js";
@@ -18,7 +18,8 @@ addEventListener("DOMContentLoaded", () => {
 
   const start = document.getElementById("start");
 
-  start.addEventListener("click", () => showScene("choice"));
+  startMusic();
+  start.addEventListener("click", () => { stopMusic(); showScene("choice"); });
 
   for (const button of document.querySelectorAll(".choice")) {
     button.addEventListener("click", () => {
