@@ -1,5 +1,5 @@
 {
-  "name": "wizard-n-which",
+  "name": "wizard-n-whitch",
   "version": "1.0.0",
   "description": "A browser-based step-by-step wizard for building a sandwich. Plain HTML/CSS/JS, no build step.",
   "main": "app.js",
@@ -8,15 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tamaslang/wizard-n-which.git"
+    "url": "git+https://github.com/tamaslang/wizard-n-whitch.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/tamaslang/wizard-n-which/issues"
+    "url": "https://github.com/tamaslang/wizard-n-whitch/issues"
   },
-  "homepage": "https://github.com/tamaslang/wizard-n-which#readme",
+  "homepage": "https://github.com/tamaslang/wizard-n-whitch#readme",
   "devDependencies": {
     "@playwright/test": "^1.64.1"
   },
