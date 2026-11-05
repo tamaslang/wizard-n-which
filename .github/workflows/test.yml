@@ -19,8 +19,8 @@ jobs:
         id: browsers
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-      - run: npx playwright install chromium
+          key: playwright-chromium-firefox-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - run: npx playwright install chromium firefox
         if: steps.browsers.outputs.cache-hit != 'true'
       - run: npm test
 

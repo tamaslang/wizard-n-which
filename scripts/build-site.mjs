@@ -10,7 +10,7 @@ export function buildSite(outDir, version) {
   const stamp = (text, re) => text.replace(re, (_, a, p, b) => `${a}${p}?v=${version}${b}`);
   for (const f of readdirSync(join(outDir, "src")).filter((n) => n.endsWith(".js"))) {
     const file = join(outDir, "src", f);
-    writeFileSync(file, stamp(readFileSync(file, "utf8"), /(from\s+")(\.\/[^"?]+\.js)(")/g));
+    writeFileSync(file, stamp(readFileSync(file, "utf8"), /((?:from|import)\s+")(\.\/[^"?]+\.js)(")/g));
   }
   let html = readFileSync("index.html", "utf8");
   html = stamp(html, /(src=")(src\/[^"?]+\.js)(")/g);

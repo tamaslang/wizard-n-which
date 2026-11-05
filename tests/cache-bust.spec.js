@@ -11,7 +11,7 @@ test("built site stamps every script, import and stylesheet with the version", (
   expect(html).toContain('src="src/main.js?v=abc123"');
   expect(html).toContain('href="style.css?v=abc123"');
   for (const f of readdirSync(join(out, "src")).filter((n) => n.endsWith(".js"))) {
-    const imports = readFileSync(join(out, "src", f), "utf8").match(/from\s+"\.\/[^"]+"/g) || [];
+    const imports = readFileSync(join(out, "src", f), "utf8").match(/(?:from|import)\s+"\.\/[^"]+"/g) || [];
     for (const i of imports) expect(i, `${f}: ${i}`).toContain("?v=abc123");
   }
 });

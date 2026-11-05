@@ -1,3 +1,4 @@
+import "./compat.js";
 import { sfx } from "./sound.js";
 import { characterSvg, helperSvg } from "./character.js";
 
@@ -422,7 +423,17 @@ for (const b of document.querySelectorAll("#touch [data-key]")) {
 async function loadSvg(svg) {
   const image = new Image();
   image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-  await image.decode();
+  try {
+    await image.decode();
+  } catch {
+    // decode() rejects for some SVGs in some browsers; the load event still works.
+    if (!image.complete || !image.naturalWidth) {
+      await new Promise((resolve, reject) => {
+        image.onload = resolve;
+        image.onerror = reject;
+      });
+    }
+  }
   return image;
 }
 
@@ -448,8 +459,13 @@ export async function startHome(canvas, character) {
   const tick = (now) => {
     const dt = Math.min((now - last) / 1000, 0.05);
     last = now;
-    update(player, dt);
-    draw(ctx, player);
+    try {
+      update(player, dt);
+      draw(ctx, player);
+    } catch (err) {
+      if (!tick.failed) console.error("Game frame failed", err);
+      tick.failed = true;
+    }
     frame = requestAnimationFrame(tick);
   };
   frame = requestAnimationFrame(tick);
